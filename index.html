@@ -3,145 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Bartender Game - 主頁</title>
+    <title>Mini Bartender Game - 精緻酒吧遊戲</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #3A2E28 0%, #2C221F 100%);
-            color: #F5F5DC;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
+        :root {
+            --primary-dark: #1a120b;
+            --secondary-dark: #3a2e28;
+            --accent-gold: #d4af37;
+            --accent-light-gold: #f9d342;
+            --text-light: #f5f5dc;
+            --text-muted: #aaa08f;
         }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 20%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
         .glass-effect {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(10, 8, 6, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.2);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
+        
         .card-hover {
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .card-hover::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(212, 175, 55, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        .card-hover:hover::before {
+            left: 100%;
+        }
+        
         .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(212, 175, 55, 0.3);
         }
+        
         .golden-button {
-            background: linear-gradient(45deg, #D4AF37, #F9D342);
+            background: linear-gradient(45deg, var(--accent-gold), var(--accent-light-gold));
             border: none;
             border-radius: 50px;
             padding: 15px 30px;
-            color: #3A2E28;
+            color: var(--secondary-dark);
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
             font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
+        
+        .golden-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .golden-button:hover::before {
+            left: 100%;
+        }
+        
         .golden-button:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+            letter-spacing: 1px;
         }
+        
         .nav-button {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 15px;
-            padding: 10px 20px;
-            color: #F5F5DC;
+            padding: 12px 24px;
+            color: var(--text-light);
             cursor: pointer;
             transition: all 0.3s ease;
             margin: 5px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .nav-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(212, 175, 55, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        .nav-button:hover::before {
+            left: 100%;
+        }
+        
+        .nav-button.active,
         .nav-button:hover {
             background: rgba(212, 175, 55, 0.2);
             transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
+        
         .game-card {
             background: rgba(58, 46, 40, 0.7);
             border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 18px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .game-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-light-gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .game-card:hover::before {
+            transform: scaleX(1);
+        }
+        
         .game-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #D4AF37, #F9D342);
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent-gold), var(--accent-light-gold));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
         }
+        
         .pulse {
             animation: pulse 2s infinite;
         }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
+        
         .floating {
-            animation: floating 3s ease-in-out infinite;
+            animation: floating 4s ease-in-out infinite;
         }
+        
         @keyframes floating {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
             100% { transform: translateY(0px); }
+        }
+        
+        .dice {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #2c221f, #1a120b);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .dice::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            color: #333;
+            border-radius: 12px;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 48%, rgba(0,0,0,0.1) 50%, transparent 52%);
+            z-index: 1;
+        }
+        
+        .section-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .section-content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .player-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid var(--accent-gold);
+            transition: all 0.3s ease;
+        }
+        
+        .player-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .result-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+        }
+        
+        .counter-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        
+        .counter-btn {
+            background: var(--accent-gold);
+            color: var(--secondary-dark);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .counter-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent-light-gold);
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .game-header::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-light);
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        
+        .select-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-light);
+            font-size: 1rem;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+        
+        .select-field:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
-    <div class="glass-effect w-full max-w-4xl mx-auto p-8">
+    <div class="glass-effect w-full max-w-4xl mx-auto p-8 relative z-10">
         <div class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 floating">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">🍺 Mini Bartender Game 🍸</span>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 floating tracking-wide">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600">🍺 Mini Bartender Game 🍸</span>
             </h1>
-            <p class="text-lg text-gray-300 mb-8">專為朋友聚會設計的精緻酒吧遊戲合輯</p>
+            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">精心打造的酒吧風格遊戲合輯，為朋友聚會增添無限樂趣</p>
             
             <!-- Navigation Buttons -->
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
-                <button class="nav-button" onclick="showSection('home')">🏠 首頁</button>
-                <button class="nav-button" onclick="showSection('dice')">🎲 骰子比大小</button>
-                <button class="nav-button" onclick="showSection('ace')">🐉 射龍門</button>
-                <button class="nav-button" onclick="showSection('wheel')">🎡 幸運轉盤</button>
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button class="nav-button active" onclick="showSection('home')" id="nav-home">
+                    <i class="fas fa-home mr-2"></i>首頁
+                </button>
+                <button class="nav-button" onclick="showSection('dice')" id="nav-dice">
+                    <i class="fas fa-dice mr-2"></i>骰子比大小
+                </button>
+                <button class="nav-button" onclick="showSection('ace')" id="nav-ace">
+                    <i class="fas fa-dragon mr-2"></i>射龍門
+                </button>
+                <button class="nav-button" onclick="showSection('wheel')" id="nav-wheel">
+                    <i class="fas fa-circle-notch mr-2"></i>幸運轉盤
+                </button>
             </div>
         </div>
         
         <!-- Home Section -->
-        <div id="home" class="section-content">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div id="home" class="section-content active">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div class="game-card card-hover pulse" onclick="showSection('dice')">
                     <div class="game-icon">
-                        <i class="fas fa-dice"></i>
+                        <i class="fas fa-dice-d20"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">骰子比大小</h3>
-                    <p class="text-gray-300">調整骰子數量，體驗物理搖骰樂趣</p>
+                    <h3 class="text-2xl font-bold mb-3">骰子比大小</h3>
+                    <p class="text-gray-300 mb-4">調整骰子數量，體驗真實物理搖骰樂趣</p>
+                    <div class="text-center">
+                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">經典遊戲</span>
+                    </div>
                 </div>
                 
-                <div class="game-card card-hover pulse" onclick="showSection('ace')">
+                <div class="game-card card-hover pulse" onclick="showSection('ace')" style="animation-delay: 0.2s;">
                     <div class="game-icon">
-                        <i class="fas fa-dragon"></i>
+                        <i class="fas fa-chess-rook"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">射龍門</h3>
-                    <p class="text-gray-300">撲克牌判定，刺激的下注體驗</p>
+                    <h3 class="text-2xl font-bold mb-3">射龍門</h3>
+                    <p class="text-gray-300 mb-4">撲克牌判定，刺激的下注體驗</p>
+                    <div class="text-center">
+                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">策略遊戲</span>
+                    </div>
                 </div>
                 
-                <div class="game-card card-hover pulse" onclick="showSection('wheel')">
+                <div class="game-card card-hover pulse" onclick="showSection('wheel')" style="animation-delay: 0.4s;">
                     <div class="game-icon">
-                        <i class="fas fa-circle-notch"></i>
+                        <i class="fas fa-gift"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">幸運轉盤</h3>
-                    <p class="text-gray-300">自訂玩家，公平公正的抽獎機制</p>
+                    <h3 class="text-2xl font-bold mb-3">幸運轉盤</h3>
+                    <p class="text-gray-300 mb-4">自訂玩家，公平公正的抽獎機制</p>
+                    <div class="text-center">
+                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">派對遊戲</span>
+                    </div>
                 </div>
             </div>
             
             <div class="text-center">
-                <p class="text-gray-400 italic mb-6">「一杯敬友誼，一杯敬歡樂」</p>
+                <p class="text-gray-400 italic mb-8 text-lg">「一杯敬友誼，一杯敬歡樂，讓遊戲串起美好時光」</p>
                 <div class="max-w-md mx-auto">
-                    <button class="golden-button w-full py-4 text-lg pulse">
-                        <i class="fas fa-play mr-2"></i>開始遊戲
+                    <button class="golden-button w-full py-5 text-xl pulse">
+                        <i class="fas fa-play-circle mr-3"></i>開始探索遊戲世界
                     </button>
                 </div>
             </div>
@@ -149,61 +491,74 @@
         
         <!-- Dice Game Section -->
         <div id="dice" class="section-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-center">🎲 骰子比大小</h2>
+            <div class="game-header">
+                <h2 class="text-3xl font-bold">🎲 骰子比大小</h2>
+            </div>
             <div class="flex flex-col items-center">
-                <div class="flex items-center justify-between mb-6 w-full max-w-md">
-                    <button onclick="changeDiceCount(-1)" class="golden-button px-6 py-3">
+                <div class="flex items-center justify-center mb-8">
+                    <button onclick="changeDiceCount(-1)" class="counter-btn">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <span id="diceCount" class="text-2xl font-bold">骰子數量: 2</span>
-                    <button onclick="changeDiceCount(1)" class="golden-button px-6 py-3">
+                    <div class="counter-display mx-6">
+                        <span id="diceCount">骰子數量: 2</span>
+                    </div>
+                    <button onclick="changeDiceCount(1)" class="counter-btn">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
-                <div id="diceContainer" class="dice-container flex justify-center gap-4 mb-6 flex-wrap"></div>
-                <button onclick="rollDice()" class="golden-button px-8 py-4 text-lg mb-4">
-                    <i class="fas fa-dice-d20 mr-2"></i>搖骰子
+                
+                <div id="diceContainer" class="dice-container"></div>
+                
+                <button onclick="rollDice()" class="golden-button px-10 py-4 text-xl mb-6">
+                    <i class="fas fa-dice mr-3"></i>搖骰子
                 </button>
-                <div id="diceResult" class="text-center text-2xl font-bold text-yellow-400"></div>
+                
+                <div id="diceResult" class="result-display w-full max-w-md"></div>
             </div>
         </div>
         
         <!-- Ace in the Hole Game Section -->
         <div id="ace" class="section-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-center">🐉 射龍門 (Ace in the Hole)</h2>
+            <div class="game-header">
+                <h2 class="text-3xl font-bold">🐉 射龍門 (Ace in the Hole)</h2>
+            </div>
             <div class="flex flex-col items-center">
-                <div class="flex justify-around w-full max-w-md mb-6">
+                <div class="flex justify-around w-full max-w-md mb-8">
                     <div id="leftCard" class="text-center">
-                        <div class="bg-white text-black p-6 rounded-xl w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold">?</div>
-                        <p class="mt-2">左柱</p>
+                        <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
+                        <p class="mt-3 text-lg">左柱</p>
                     </div>
                     <div id="rightCard" class="text-center">
-                        <div class="bg-white text-black p-6 rounded-xl w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold">?</div>
-                        <p class="mt-2">右柱</p>
+                        <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
+                        <p class="mt-3 text-lg">右柱</p>
                     </div>
                 </div>
-                <div class="flex justify-center space-x-4 mb-6">
-                    <button onclick="dealCards()" class="golden-button px-6 py-3">
-                        <i class="fas fa-hand-paper mr-2"></i>發牌
+                
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button onclick="dealCards()" class="golden-button px-8 py-3">
+                        <i class="fas fa-hand-sparkles mr-2"></i>發牌
                     </button>
-                    <button onclick="bet(true)" class="golden-button px-6 py-3">
+                    <button onclick="bet(true)" class="golden-button px-8 py-3">
                         <i class="fas fa-coins mr-2"></i>下注
                     </button>
-                    <button onclick="bet(false)" class="golden-button px-6 py-3">
-                        <i class="fas fa-times mr-2"></i>不下注
+                    <button onclick="bet(false)" class="golden-button px-8 py-3">
+                        <i class="fas fa-times-circle mr-2"></i>不下注
                     </button>
                 </div>
-                <div id="aceResult" class="text-center text-2xl font-bold text-yellow-400"></div>
+                
+                <div id="aceResult" class="result-display w-full max-w-md"></div>
             </div>
         </div>
         
         <!-- Lucky Wheel Section -->
         <div id="wheel" class="section-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-center">🎡 幸運轉盤</h2>
+            <div class="game-header">
+                <h2 class="text-3xl font-bold">🎡 幸運轉盤</h2>
+            </div>
             <div class="flex flex-col items-center">
-                <div class="w-full max-w-md mb-6">
-                    <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="w-full p-3 rounded-lg bg-gray-800 text-white mb-3">
-                    <select id="playerEmoji" class="w-full p-3 rounded-lg bg-gray-800 text-white">
+                <div class="w-full max-w-md mb-8">
+                    <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="input-field mb-4">
+                    <select id="playerEmoji" class="select-field">
                         <option value="">選擇你的動物</option>
                         <option value="🐶">🐶 狗狗</option>
                         <option value="🐱">🐱 貓咪</option>
@@ -217,21 +572,31 @@
                         <option value="🐯">🐯 老虎</option>
                         <option value="🦄">🦄 獨角獸</option>
                         <option value="🦉">🦉 貓頭鷹</option>
+                        <option value="🐸">🐸 青蛙</option>
+                        <option value="🐵">🐵 猴子</option>
+                        <option value="🐔">🐔 雞雞</option>
+                        <option value="🐧">🐧 企鵝</option>
                     </select>
                 </div>
-                <button onclick="addPlayer()" class="golden-button px-8 py-3 mb-6">
-                    <i class="fas fa-user-plus mr-2"></i>新增玩家
+                
+                <button onclick="addPlayer()" class="golden-button px-10 py-3 mb-8">
+                    <i class="fas fa-user-plus mr-3"></i>新增玩家
                 </button>
-                <div id="wheelPlayers" class="w-full max-w-md mb-6">
-                    <h3 class="text-lg font-semibold mb-3 text-center">參與玩家</h3>
-                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4 max-h-40 overflow-y-auto">
-                        <!-- Players will be added here -->
+                
+                <div id="wheelPlayers" class="w-full max-w-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-center">參與玩家 (<span id="playerCount">0</span>)</h3>
+                    <div class="bg-gray-800 bg-opacity-30 rounded-xl p-4 max-h-60 overflow-y-auto">
+                        <div id="playersList" class="space-y-3">
+                            <p class="text-gray-400 text-center py-8">尚無玩家，請新增玩家</p>
+                        </div>
                     </div>
                 </div>
-                <button onclick="spinWheel()" class="golden-button px-8 py-4 text-lg mb-4">
-                    <i class="fas fa-sync-alt mr-2"></i>旋轉轉盤
+                
+                <button onclick="spinWheel()" class="golden-button px-10 py-4 text-xl mb-6">
+                    <i class="fas fa-sync-alt mr-3 animate-spin-once"></i>旋轉轉盤
                 </button>
-                <div id="wheelResult" class="text-center text-2xl font-bold text-yellow-400"></div>
+                
+                <div id="wheelResult" class="result-display w-full max-w-md"></div>
             </div>
         </div>
     </div>
@@ -247,13 +612,38 @@
             section.classList.add('hidden');
         });
         document.getElementById('home').classList.remove('hidden');
+        
+        // Initialize nav buttons
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        document.getElementById('nav-home').classList.add('active');
 
-        // Show selected section
+        // Show selected section with animation
         function showSection(sectionId) {
+            // Hide all sections
             document.querySelectorAll('.section-content').forEach(section => {
-                section.classList.add('hidden');
+                section.classList.remove('active');
+                setTimeout(() => {
+                    section.classList.add('hidden');
+                }, 300);
             });
-            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Add active class to clicked nav button
+            document.getElementById(`nav-${sectionId}`).classList.add('active');
+            
+            // Show selected section after a delay to allow for animation
+            setTimeout(() => {
+                document.getElementById(sectionId).classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById(sectionId).classList.add('active');
+                }, 10);
+            }, 300);
         }
 
         // Dice Game Functions
@@ -269,11 +659,9 @@
             let total = 0;
             for (let i = 0; i < diceCount; i++) {
                 const die = document.createElement('div');
-                die.className = 'dice bg-white text-black rounded-lg w-16 h-16 flex items-center justify-center text-2xl font-bold';
+                die.className = 'dice';
                 die.textContent = '?';
-                die.style.animation = 'none';
-                void die.offsetWidth; // Trigger reflow
-                die.style.animation = 'none';
+                die.style.opacity = '0.7';
                 container.appendChild(die);
                 
                 // Animation effect
@@ -283,7 +671,9 @@
                     total += value;
                     
                     // Add animation effect
+                    die.style.transition = 'all 0.3s ease';
                     die.style.transform = 'scale(1.2)';
+                    die.style.opacity = '1';
                     setTimeout(() => {
                         die.style.transform = 'scale(1)';
                     }, 200);
@@ -291,7 +681,7 @@
             }
             
             setTimeout(() => {
-                document.getElementById('diceResult').textContent = `總點數: ${total}`;
+                document.getElementById('diceResult').innerHTML = `<div class="flex items-center justify-center"><i class="fas fa-calculator text-2xl mr-3"></i><span>總點數: ${total}</span></div>`;
             }, diceCount * 300);
         }
 
@@ -311,20 +701,33 @@
             const rightValue = parseInt(document.querySelector('#rightCard div').textContent);
             
             if (isNaN(leftValue) || isNaN(rightValue)) {
-                document.getElementById('aceResult').textContent = '請先發牌！';
+                document.getElementById('aceResult').innerHTML = `<div class="flex items-center justify-center text-red-400"><i class="fas fa-exclamation-triangle mr-3"></i>請先發牌！</div>`;
                 return;
             }
             
             const thirdCard = Math.floor(Math.random() * 13) + 1;
             
             let result = '';
+            let resultClass = '';
             if (thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) {
-                result = isBet ? '🎉 恭喜中獎！' : '😢 可惜沒下注';
+                if (isBet) {
+                    result = '🎉 恭喜中獎！';
+                    resultClass = 'text-green-400';
+                } else {
+                    result = '😢 可惜沒下注';
+                    resultClass = 'text-yellow-400';
+                }
             } else {
-                result = isBet ? '😢 可惜沒中' : '😊 明智的選擇';
+                if (isBet) {
+                    result = '😢 可惜沒中';
+                    resultClass = 'text-red-400';
+                } else {
+                    result = '😊 明智的選擇';
+                    resultClass = 'text-blue-400';
+                }
             }
             
-            document.getElementById('aceResult').textContent = `${result} (第三張牌: ${thirdCard})`;
+            document.getElementById('aceResult').innerHTML = `<div class="flex items-center justify-center ${resultClass}"><i class="fas fa-star mr-3"></i>${result} <span class="ml-2">(第三張牌: ${thirdCard})</span></div>`;
         }
 
         // Lucky Wheel Functions
@@ -349,28 +752,32 @@
         }
 
         function updatePlayerList() {
-            const container = document.querySelector('#wheelPlayers .bg-gray-800');
-            container.innerHTML = '';
+            const container = document.getElementById('playersList');
+            const countElement = document.getElementById('playerCount');
             
             if (players.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-center py-8">尚無玩家，請新增玩家</p>';
+                countElement.textContent = '0';
                 return;
             }
             
+            container.innerHTML = '';
             players.forEach((player, index) => {
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'flex items-center justify-between p-2 border-b border-gray-700';
+                playerDiv.className = 'player-item';
                 playerDiv.innerHTML = `
                     <div class="flex items-center">
                         <span class="text-2xl mr-3">${player.emoji}</span>
-                        <span>${player.name}</span>
+                        <span class="font-medium">${player.name}</span>
                     </div>
-                    <button onclick="removePlayer(${index})" class="text-red-500 hover:text-red-400">
+                    <button onclick="removePlayer(${index})" class="text-red-500 hover:text-red-400 p-2">
                         <i class="fas fa-trash"></i>
                     </button>
                 `;
                 container.appendChild(playerDiv);
             });
+            
+            countElement.textContent = players.length;
         }
 
         function removePlayer(index) {
@@ -380,7 +787,7 @@
 
         function spinWheel() {
             if (players.length < 2) {
-                alert('至少需要兩位玩家！');
+                document.getElementById('wheelResult').innerHTML = `<div class="flex items-center justify-center text-red-400"><i class="fas fa-exclamation-triangle mr-3"></i>至少需要兩位玩家！</div>`;
                 return;
             }
             
@@ -388,25 +795,41 @@
             
             wheelSpinning = true;
             const resultElement = document.getElementById('wheelResult');
-            resultElement.textContent = '轉盤旋轉中...';
+            resultElement.innerHTML = '<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-spinner fa-spin mr-3"></i>轉盤旋轉中...</div>';
             
             // Simulate spinning animation
             let spins = 0;
             const maxSpins = 20;
             const interval = setInterval(() => {
                 const randomIndex = Math.floor(Math.random() * players.length);
-                resultElement.textContent = `當前: ${players[randomIndex].emoji} ${players[randomIndex].name}`;
+                resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-sync-alt mr-3"></i>當前: ${players[randomIndex].emoji} ${players[randomIndex].name}</div>`;
                 spins++;
                 
                 if (spins >= maxSpins) {
                     clearInterval(interval);
                     const winnerIndex = Math.floor(Math.random() * players.length);
                     const winner = players[winnerIndex];
-                    resultElement.innerHTML = `🏆 <span class="text-yellow-400">獲勝者: ${winner.emoji} ${winner.name}</span>`;
+                    resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-crown text-2xl mr-3"></i><span class="text-2xl">🏆 獲勝者: ${winner.emoji} ${winner.name}</span></div>`;
                     wheelSpinning = false;
                 }
             }, 100);
         }
+        
+        // Add animation for spin button
+        document.addEventListener('DOMContentLoaded', function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .animate-spin-once {
+                    animation: spinOnce 0.5s ease;
+                }
+                
+                @keyframes spinOnce {
+                    0% { transform: rotate(0); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
     </script>
 </body>
 </html>
