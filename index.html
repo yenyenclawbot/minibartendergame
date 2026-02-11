@@ -3,117 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Bartender Game</title>
+    <title>Mini Bartender Game - 主頁</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #3A2E28;
+            background: linear-gradient(135deg, #3A2E28 0%, #2C221F 100%);
             color: #F5F5DC;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
         .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
         .golden-button {
             background: linear-gradient(45deg, #D4AF37, #F9D342);
             border: none;
             border-radius: 50px;
-            padding: 10px 20px;
+            padding: 15px 30px;
             color: #3A2E28;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            font-size: 1.1rem;
         }
-        .dice-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
+        .golden-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
         }
-        .dice {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .nav-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 10px 20px;
+            color: #F5F5DC;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .nav-button:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: translateY(-3px);
+        }
+        .game-card {
+            background: rgba(58, 46, 40, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #D4AF37, #F9D342);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-    <div class="glass-effect p-8 w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center mb-6">🍺 Mini Bartender Game 🍸</h1>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="glass-effect w-full max-w-4xl mx-auto p-8">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 floating">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">🍺 Mini Bartender Game 🍸</span>
+            </h1>
+            <p class="text-lg text-gray-300 mb-8">專為朋友聚會設計的精緻酒吧遊戲合輯</p>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="nav-button" onclick="showSection('home')">🏠 首頁</button>
+                <button class="nav-button" onclick="showSection('dice')">🎲 骰子比大小</button>
+                <button class="nav-button" onclick="showSection('ace')">🐉 射龍門</button>
+                <button class="nav-button" onclick="showSection('wheel')">🎡 幸運轉盤</button>
+            </div>
+        </div>
+        
+        <!-- Home Section -->
+        <div id="home" class="section-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="game-card card-hover pulse" onclick="showSection('dice')">
+                    <div class="game-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">骰子比大小</h3>
+                    <p class="text-gray-300">調整骰子數量，體驗物理搖骰樂趣</p>
+                </div>
+                
+                <div class="game-card card-hover pulse" onclick="showSection('ace')">
+                    <div class="game-icon">
+                        <i class="fas fa-dragon"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">射龍門</h3>
+                    <p class="text-gray-300">撲克牌判定，刺激的下注體驗</p>
+                </div>
+                
+                <div class="game-card card-hover pulse" onclick="showSection('wheel')">
+                    <div class="game-icon">
+                        <i class="fas fa-circle-notch"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">幸運轉盤</h3>
+                    <p class="text-gray-300">自訂玩家，公平公正的抽獎機制</p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-gray-400 italic mb-6">「一杯敬友誼，一杯敬歡樂」</p>
+                <div class="max-w-md mx-auto">
+                    <button class="golden-button w-full py-4 text-lg pulse">
+                        <i class="fas fa-play mr-2"></i>開始遊戲
+                    </button>
+                </div>
+            </div>
+        </div>
         
         <!-- Dice Game Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">🎲 骰子比大小</h2>
-            <div class="flex items-center justify-between mb-4">
-                <button onclick="changeDiceCount(-1)" class="golden-button">-</button>
-                <span id="diceCount" class="text-lg">骰子數量: 2</span>
-                <button onclick="changeDiceCount(1)" class="golden-button">+</button>
+        <div id="dice" class="section-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-center">🎲 骰子比大小</h2>
+            <div class="flex flex-col items-center">
+                <div class="flex items-center justify-between mb-6 w-full max-w-md">
+                    <button onclick="changeDiceCount(-1)" class="golden-button px-6 py-3">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span id="diceCount" class="text-2xl font-bold">骰子數量: 2</span>
+                    <button onclick="changeDiceCount(1)" class="golden-button px-6 py-3">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="diceContainer" class="dice-container flex justify-center gap-4 mb-6 flex-wrap"></div>
+                <button onclick="rollDice()" class="golden-button px-8 py-4 text-lg mb-4">
+                    <i class="fas fa-dice-d20 mr-2"></i>搖骰子
+                </button>
+                <div id="diceResult" class="text-center text-2xl font-bold text-yellow-400"></div>
             </div>
-            <div id="diceContainer" class="dice-container"></div>
-            <button onclick="rollDice()" class="golden-button w-full mt-4">搖骰子</button>
-            <div id="diceResult" class="text-center mt-4 text-xl font-bold"></div>
         </div>
         
         <!-- Ace in the Hole Game Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">🐉 射龍門 (Ace in the Hole)</h2>
-            <div class="flex justify-around mb-4">
-                <div id="leftCard" class="text-center">
-                    <div class="bg-white text-black p-4 rounded-lg w-16 h-24 mx-auto flex items-center justify-center">?</div>
-                    <p class="mt-2">左柱</p>
+        <div id="ace" class="section-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-center">🐉 射龍門 (Ace in the Hole)</h2>
+            <div class="flex flex-col items-center">
+                <div class="flex justify-around w-full max-w-md mb-6">
+                    <div id="leftCard" class="text-center">
+                        <div class="bg-white text-black p-6 rounded-xl w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold">?</div>
+                        <p class="mt-2">左柱</p>
+                    </div>
+                    <div id="rightCard" class="text-center">
+                        <div class="bg-white text-black p-6 rounded-xl w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold">?</div>
+                        <p class="mt-2">右柱</p>
+                    </div>
                 </div>
-                <div id="rightCard" class="text-center">
-                    <div class="bg-white text-black p-4 rounded-lg w-16 h-24 mx-auto flex items-center justify-center">?</div>
-                    <p class="mt-2">右柱</p>
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button onclick="dealCards()" class="golden-button px-6 py-3">
+                        <i class="fas fa-hand-paper mr-2"></i>發牌
+                    </button>
+                    <button onclick="bet(true)" class="golden-button px-6 py-3">
+                        <i class="fas fa-coins mr-2"></i>下注
+                    </button>
+                    <button onclick="bet(false)" class="golden-button px-6 py-3">
+                        <i class="fas fa-times mr-2"></i>不下注
+                    </button>
                 </div>
+                <div id="aceResult" class="text-center text-2xl font-bold text-yellow-400"></div>
             </div>
-            <div class="flex justify-center space-x-4">
-                <button onclick="dealCards()" class="golden-button">發牌</button>
-                <button onclick="bet(true)" class="golden-button">下注</button>
-                <button onclick="bet(false)" class="golden-button">不下注</button>
-            </div>
-            <div id="aceResult" class="text-center mt-4 text-xl font-bold"></div>
         </div>
         
         <!-- Lucky Wheel Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">🎡 幸運轉盤</h2>
-            <div class="mb-4">
-                <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="w-full p-2 rounded bg-gray-700 text-white">
-                <select id="playerEmoji" class="w-full p-2 rounded bg-gray-700 text-white mt-2">
-                    <option value="">選擇你的動物</option>
-                    <option value="🐶">🐶 狗狗</option>
-                    <option value="🐱">🐱 貓咪</option>
-                    <option value="🐭">🐭 老鼠</option>
-                    <option value="🐹">🐹 天竺鼠</option>
-                    <option value="🐰">🐰 兔子</option>
-                    <option value="🦊">🦊 狐狸</option>
-                    <option value="🐻">🐻 熊熊</option>
-                    <option value="🐼">🐼 熊貓</option>
-                </select>
-            </div>
-            <button onclick="addPlayer()" class="golden-button w-full">新增玩家</button>
-            <div class="flex justify-center mt-4">
-                <div id="wheelPlayers" class="text-center">
-                    <!-- Players will be added here -->
+        <div id="wheel" class="section-content hidden">
+            <h2 class="text-2xl font-bold mb-6 text-center">🎡 幸運轉盤</h2>
+            <div class="flex flex-col items-center">
+                <div class="w-full max-w-md mb-6">
+                    <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="w-full p-3 rounded-lg bg-gray-800 text-white mb-3">
+                    <select id="playerEmoji" class="w-full p-3 rounded-lg bg-gray-800 text-white">
+                        <option value="">選擇你的動物</option>
+                        <option value="🐶">🐶 狗狗</option>
+                        <option value="🐱">🐱 貓咪</option>
+                        <option value="🐭">🐭 老鼠</option>
+                        <option value="🐹">🐹 天竺鼠</option>
+                        <option value="🐰">🐰 兔子</option>
+                        <option value="🦊">🦊 狐狸</option>
+                        <option value="🐻">🐻 熊熊</option>
+                        <option value="🐼">🐼 熊貓</option>
+                        <option value="🦁">🦁 獅子</option>
+                        <option value="🐯">🐯 老虎</option>
+                        <option value="🦄">🦄 獨角獸</option>
+                        <option value="🦉">🦉 貓頭鷹</option>
+                    </select>
                 </div>
+                <button onclick="addPlayer()" class="golden-button px-8 py-3 mb-6">
+                    <i class="fas fa-user-plus mr-2"></i>新增玩家
+                </button>
+                <div id="wheelPlayers" class="w-full max-w-md mb-6">
+                    <h3 class="text-lg font-semibold mb-3 text-center">參與玩家</h3>
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4 max-h-40 overflow-y-auto">
+                        <!-- Players will be added here -->
+                    </div>
+                </div>
+                <button onclick="spinWheel()" class="golden-button px-8 py-4 text-lg mb-4">
+                    <i class="fas fa-sync-alt mr-2"></i>旋轉轉盤
+                </button>
+                <div id="wheelResult" class="text-center text-2xl font-bold text-yellow-400"></div>
             </div>
-            <button onclick="spinWheel()" class="golden-button w-full mt-4">旋轉轉盤</button>
-            <div id="wheelResult" class="text-center mt-4 text-xl font-bold"></div>
         </div>
     </div>
 
     <script>
+        // Global variables
         let diceCount = 2;
         let players = [];
         let wheelSpinning = false;
+        
+        // Initialize sections
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById('home').classList.remove('hidden');
+
+        // Show selected section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
 
         // Dice Game Functions
         function changeDiceCount(change) {
@@ -128,8 +269,11 @@
             let total = 0;
             for (let i = 0; i < diceCount; i++) {
                 const die = document.createElement('div');
-                die.className = 'dice';
+                die.className = 'dice bg-white text-black rounded-lg w-16 h-16 flex items-center justify-center text-2xl font-bold';
                 die.textContent = '?';
+                die.style.animation = 'none';
+                void die.offsetWidth; // Trigger reflow
+                die.style.animation = 'none';
                 container.appendChild(die);
                 
                 // Animation effect
@@ -175,12 +319,12 @@
             
             let result = '';
             if (thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) {
-                result = isBet ? '恭喜中獎！🎉' : '可惜沒下注 😢';
+                result = isBet ? '🎉 恭喜中獎！' : '😢 可惜沒下注';
             } else {
-                result = isBet ? '可惜沒中 😢' : '明智的選擇 😊';
+                result = isBet ? '😢 可惜沒中' : '😊 明智的選擇';
             }
             
-            document.getElementById('aceResult').textContent = `${result} 第三張牌: ${thirdCard}`;
+            document.getElementById('aceResult').textContent = `${result} (第三張牌: ${thirdCard})`;
         }
 
         // Lucky Wheel Functions
@@ -205,16 +349,25 @@
         }
 
         function updatePlayerList() {
-            const container = document.getElementById('wheelPlayers');
-            container.innerHTML = '<h3 class="text-lg font-semibold mb-2">玩家列表:</h3>';
+            const container = document.querySelector('#wheelPlayers .bg-gray-800');
+            container.innerHTML = '';
+            
+            if (players.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">尚無玩家，請新增玩家</p>';
+                return;
+            }
             
             players.forEach((player, index) => {
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'flex items-center justify-center my-1';
+                playerDiv.className = 'flex items-center justify-between p-2 border-b border-gray-700';
                 playerDiv.innerHTML = `
-                    <span class="mr-2">${player.emoji}</span>
-                    <span>${player.name}</span>
-                    <button onclick="removePlayer(${index})" class="ml-2 text-red-500">🗑️</button>
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">${player.emoji}</span>
+                        <span>${player.name}</span>
+                    </div>
+                    <button onclick="removePlayer(${index})" class="text-red-500 hover:text-red-400">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 `;
                 container.appendChild(playerDiv);
             });
@@ -249,7 +402,7 @@
                     clearInterval(interval);
                     const winnerIndex = Math.floor(Math.random() * players.length);
                     const winner = players[winnerIndex];
-                    resultElement.textContent = `🏆 獲勝者: ${winner.emoji} ${winner.name}`;
+                    resultElement.innerHTML = `🏆 <span class="text-yellow-400">獲勝者: ${winner.emoji} ${winner.name}</span>`;
                     wheelSpinning = false;
                 }
             }, 100);
