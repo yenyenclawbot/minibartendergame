@@ -52,6 +52,47 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
+        .vertical-nav {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 24px;
+            margin: 12px 0;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background: rgba(212, 175, 55, 0.15);
+            transform: translateX(5px);
+            border-left: 4px solid var(--accent-gold);
+        }
+        
+        .nav-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-left: 4px solid var(--accent-gold);
+            transform: translateX(5px);
+        }
+        
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
         .card-hover {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
@@ -126,47 +167,6 @@
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
             letter-spacing: 1px;
-        }
-        
-        .nav-button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 15px;
-            padding: 12px 24px;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 5px;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-button::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(212, 175, 55, 0.2),
-                transparent
-            );
-            transition: 0.5s;
-        }
-        
-        .nav-button:hover::before {
-            left: 100%;
-        }
-        
-        .nav-button.active,
-        .nav-button:hover {
-            background: rgba(212, 175, 55, 0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .game-card {
@@ -418,185 +418,201 @@
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
-    <div class="glass-effect w-full max-w-4xl mx-auto p-8 relative z-10">
-        <div class="text-center mb-10">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4 floating tracking-wide">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600">🍺 Mini Bartender Game 🍸</span>
-            </h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">精心打造的酒吧風格遊戲合輯，為朋友聚會增添無限樂趣</p>
-            
-            <!-- Navigation Buttons -->
-            <div class="flex flex-wrap justify-center gap-3 mb-12">
-                <button class="nav-button active" onclick="showSection('home')" id="nav-home">
-                    <i class="fas fa-home mr-2"></i>首頁
-                </button>
-                <button class="nav-button" onclick="showSection('dice')" id="nav-dice">
-                    <i class="fas fa-dice mr-2"></i>骰子比大小
-                </button>
-                <button class="nav-button" onclick="showSection('ace')" id="nav-ace">
-                    <i class="fas fa-dragon mr-2"></i>射龍門
-                </button>
-                <button class="nav-button" onclick="showSection('wheel')" id="nav-wheel">
-                    <i class="fas fa-circle-notch mr-2"></i>幸運轉盤
-                </button>
-            </div>
-        </div>
-        
-        <!-- Home Section -->
-        <div id="home" class="section-content active">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="game-card card-hover pulse" onclick="showSection('dice')">
-                    <div class="game-icon">
-                        <i class="fas fa-dice-d20"></i>
+    <div class="glass-effect w-full max-w-6xl mx-auto p-8 relative z-10">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Vertical Navigation -->
+            <div class="lg:w-1/4">
+                <div class="vertical-nav h-full">
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold mb-2 floating">
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">🍺 Bartender</span>
+                        </h1>
+                        <p class="text-gray-400 text-sm">精緻酒吧遊戲</p>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">骰子比大小</h3>
-                    <p class="text-gray-300 mb-4">調整骰子數量，體驗真實物理搖骰樂趣</p>
-                    <div class="text-center">
-                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">經典遊戲</span>
+                    
+                    <div class="nav-item active" onclick="showSection('home')" id="nav-home">
+                        <i class="fas fa-home"></i>
+                        <span>主選單</span>
                     </div>
-                </div>
-                
-                <div class="game-card card-hover pulse" onclick="showSection('ace')" style="animation-delay: 0.2s;">
-                    <div class="game-icon">
-                        <i class="fas fa-chess-rook"></i>
+                    <div class="nav-item" onclick="showSection('dice')" id="nav-dice">
+                        <i class="fas fa-dice"></i>
+                        <span>骰子比大小</span>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">射龍門</h3>
-                    <p class="text-gray-300 mb-4">撲克牌判定，刺激的下注體驗</p>
-                    <div class="text-center">
-                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">策略遊戲</span>
+                    <div class="nav-item" onclick="showSection('ace')" id="nav-ace">
+                        <i class="fas fa-dragon"></i>
+                        <span>射龍門</span>
                     </div>
-                </div>
-                
-                <div class="game-card card-hover pulse" onclick="showSection('wheel')" style="animation-delay: 0.4s;">
-                    <div class="game-icon">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">幸運轉盤</h3>
-                    <p class="text-gray-300 mb-4">自訂玩家，公平公正的抽獎機制</p>
-                    <div class="text-center">
-                        <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">派對遊戲</span>
+                    <div class="nav-item" onclick="showSection('wheel')" id="nav-wheel">
+                        <i class="fas fa-circle-notch"></i>
+                        <span>幸運轉盤</span>
                     </div>
                 </div>
             </div>
             
-            <div class="text-center">
-                <p class="text-gray-400 italic mb-8 text-lg">「一杯敬友誼，一杯敬歡樂，讓遊戲串起美好時光」</p>
-                <div class="max-w-md mx-auto">
-                    <button class="golden-button w-full py-5 text-xl pulse">
-                        <i class="fas fa-play-circle mr-3"></i>開始探索遊戲世界
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Dice Game Section -->
-        <div id="dice" class="section-content hidden">
-            <div class="game-header">
-                <h2 class="text-3xl font-bold">🎲 骰子比大小</h2>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="flex items-center justify-center mb-8">
-                    <button onclick="changeDiceCount(-1)" class="counter-btn">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <div class="counter-display mx-6">
-                        <span id="diceCount">骰子數量: 2</span>
+            <!-- Main Content Area -->
+            <div class="lg:w-3/4">
+                <!-- Home Section -->
+                <div id="home" class="section-content active">
+                    <div class="text-center mb-10">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-4">精選遊戲合輯</h1>
+                        <p class="text-lg text-gray-300 mb-8">為朋友聚會精心挑選的經典酒吧遊戲</p>
                     </div>
-                    <button onclick="changeDiceCount(1)" class="counter-btn">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                
-                <div id="diceContainer" class="dice-container"></div>
-                
-                <button onclick="rollDice()" class="golden-button px-10 py-4 text-xl mb-6">
-                    <i class="fas fa-dice mr-3"></i>搖骰子
-                </button>
-                
-                <div id="diceResult" class="result-display w-full max-w-md"></div>
-            </div>
-        </div>
-        
-        <!-- Ace in the Hole Game Section -->
-        <div id="ace" class="section-content hidden">
-            <div class="game-header">
-                <h2 class="text-3xl font-bold">🐉 射龍門 (Ace in the Hole)</h2>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="flex justify-around w-full max-w-md mb-8">
-                    <div id="leftCard" class="text-center">
-                        <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
-                        <p class="mt-3 text-lg">左柱</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <div class="game-card card-hover pulse" onclick="showSection('dice')">
+                            <div class="game-icon">
+                                <i class="fas fa-dice-d20"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">骰子比大小</h3>
+                            <p class="text-gray-300 mb-4">調整骰子數量，體驗真實物理搖骰樂趣</p>
+                            <div class="text-center">
+                                <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">經典遊戲</span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card card-hover pulse" onclick="showSection('ace')" style="animation-delay: 0.2s;">
+                            <div class="game-icon">
+                                <i class="fas fa-chess-rook"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">射龍門</h3>
+                            <p class="text-gray-300 mb-4">撲克牌判定，刺激的下注體驗</p>
+                            <div class="text-center">
+                                <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">策略遊戲</span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card card-hover pulse" onclick="showSection('wheel')" style="animation-delay: 0.4s;">
+                            <div class="game-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3">幸運轉盤</h3>
+                            <p class="text-gray-300 mb-4">自訂玩家，公平公正的抽獎機制</p>
+                            <div class="text-center">
+                                <span class="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm">派對遊戲</span>
+                            </div>
+                        </div>
                     </div>
-                    <div id="rightCard" class="text-center">
-                        <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
-                        <p class="mt-3 text-lg">右柱</p>
-                    </div>
-                </div>
-                
-                <div class="flex flex-wrap justify-center gap-4 mb-8">
-                    <button onclick="dealCards()" class="golden-button px-8 py-3">
-                        <i class="fas fa-hand-sparkles mr-2"></i>發牌
-                    </button>
-                    <button onclick="bet(true)" class="golden-button px-8 py-3">
-                        <i class="fas fa-coins mr-2"></i>下注
-                    </button>
-                    <button onclick="bet(false)" class="golden-button px-8 py-3">
-                        <i class="fas fa-times-circle mr-2"></i>不下注
-                    </button>
-                </div>
-                
-                <div id="aceResult" class="result-display w-full max-w-md"></div>
-            </div>
-        </div>
-        
-        <!-- Lucky Wheel Section -->
-        <div id="wheel" class="section-content hidden">
-            <div class="game-header">
-                <h2 class="text-3xl font-bold">🎡 幸運轉盤</h2>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="w-full max-w-md mb-8">
-                    <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="input-field mb-4">
-                    <select id="playerEmoji" class="select-field">
-                        <option value="">選擇你的動物</option>
-                        <option value="🐶">🐶 狗狗</option>
-                        <option value="🐱">🐱 貓咪</option>
-                        <option value="🐭">🐭 老鼠</option>
-                        <option value="🐹">🐹 天竺鼠</option>
-                        <option value="🐰">🐰 兔子</option>
-                        <option value="🦊">🦊 狐狸</option>
-                        <option value="🐻">🐻 熊熊</option>
-                        <option value="🐼">🐼 熊貓</option>
-                        <option value="🦁">🦁 獅子</option>
-                        <option value="🐯">🐯 老虎</option>
-                        <option value="🦄">🦄 獨角獸</option>
-                        <option value="🦉">🦉 貓頭鷹</option>
-                        <option value="🐸">🐸 青蛙</option>
-                        <option value="🐵">🐵 猴子</option>
-                        <option value="🐔">🐔 雞雞</option>
-                        <option value="🐧">🐧 企鵝</option>
-                    </select>
-                </div>
-                
-                <button onclick="addPlayer()" class="golden-button px-10 py-3 mb-8">
-                    <i class="fas fa-user-plus mr-3"></i>新增玩家
-                </button>
-                
-                <div id="wheelPlayers" class="w-full max-w-md mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-center">參與玩家 (<span id="playerCount">0</span>)</h3>
-                    <div class="bg-gray-800 bg-opacity-30 rounded-xl p-4 max-h-60 overflow-y-auto">
-                        <div id="playersList" class="space-y-3">
-                            <p class="text-gray-400 text-center py-8">尚無玩家，請新增玩家</p>
+                    
+                    <div class="text-center">
+                        <p class="text-gray-400 italic mb-8 text-lg">「一杯敬友誼，一杯敬歡樂，讓遊戲串起美好時光」</p>
+                        <div class="max-w-md mx-auto">
+                            <button class="golden-button w-full py-5 text-xl pulse">
+                                <i class="fas fa-play-circle mr-3"></i>開始探索遊戲世界
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                <button onclick="spinWheel()" class="golden-button px-10 py-4 text-xl mb-6">
-                    <i class="fas fa-sync-alt mr-3 animate-spin-once"></i>旋轉轉盤
-                </button>
+                <!-- Dice Game Section -->
+                <div id="dice" class="section-content hidden">
+                    <div class="game-header">
+                        <h2 class="text-3xl font-bold">🎲 骰子比大小</h2>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center mb-8">
+                            <button onclick="changeDiceCount(-1)" class="counter-btn">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <div class="counter-display mx-6">
+                                <span id="diceCount">骰子數量: 2</span>
+                            </div>
+                            <button onclick="changeDiceCount(1)" class="counter-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="diceContainer" class="dice-container"></div>
+                        
+                        <button onclick="rollDice()" class="golden-button px-10 py-4 text-xl mb-6">
+                            <i class="fas fa-dice mr-3"></i>搖骰子
+                        </button>
+                        
+                        <div id="diceResult" class="result-display w-full max-w-md"></div>
+                    </div>
+                </div>
                 
-                <div id="wheelResult" class="result-display w-full max-w-md"></div>
+                <!-- Ace in the Hole Game Section -->
+                <div id="ace" class="section-content hidden">
+                    <div class="game-header">
+                        <h2 class="text-3xl font-bold">🐉 射龍門 (Ace in the Hole)</h2>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex justify-around w-full max-w-md mb-8">
+                            <div id="leftCard" class="text-center">
+                                <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
+                                <p class="mt-3 text-lg">左柱</p>
+                            </div>
+                            <div id="rightCard" class="text-center">
+                                <div class="card w-20 h-32 mx-auto flex items-center justify-center text-3xl font-bold shadow-lg">?</div>
+                                <p class="mt-3 text-lg">右柱</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap justify-center gap-4 mb-8">
+                            <button onclick="dealCards()" class="golden-button px-8 py-3">
+                                <i class="fas fa-hand-sparkles mr-2"></i>發牌
+                            </button>
+                            <button onclick="bet(true)" class="golden-button px-8 py-3">
+                                <i class="fas fa-coins mr-2"></i>下注
+                            </button>
+                            <button onclick="bet(false)" class="golden-button px-8 py-3">
+                                <i class="fas fa-times-circle mr-2"></i>不下注
+                            </button>
+                        </div>
+                        
+                        <div id="aceResult" class="result-display w-full max-w-md"></div>
+                    </div>
+                </div>
+                
+                <!-- Lucky Wheel Section -->
+                <div id="wheel" class="section-content hidden">
+                    <div class="game-header">
+                        <h2 class="text-3xl font-bold">🎡 幸運轉盤</h2>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-full max-w-md mb-8">
+                            <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="input-field mb-4">
+                            <select id="playerEmoji" class="select-field">
+                                <option value="">選擇你的動物</option>
+                                <option value="🐶">🐶 狗狗</option>
+                                <option value="🐱">🐱 貓咪</option>
+                                <option value="🐭">🐭 老鼠</option>
+                                <option value="🐹">🐹 天竺鼠</option>
+                                <option value="🐰">🐰 兔子</option>
+                                <option value="🦊">🦊 狐狸</option>
+                                <option value="🐻">🐻 熊熊</option>
+                                <option value="🐼">🐼 熊貓</option>
+                                <option value="🦁">🦁 獅子</option>
+                                <option value="🐯">🐯 老虎</option>
+                                <option value="🦄">🦄 獨角獸</option>
+                                <option value="🦉">🦉 貓頭鷹</option>
+                                <option value="🐸">🐸 青蛙</option>
+                                <option value="🐵">🐵 猴子</option>
+                                <option value="🐔">🐔 雞雞</option>
+                                <option value="🐧">🐧 企鵝</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="addPlayer()" class="golden-button px-10 py-3 mb-8">
+                            <i class="fas fa-user-plus mr-3"></i>新增玩家
+                        </button>
+                        
+                        <div id="wheelPlayers" class="w-full max-w-md mb-8">
+                            <h3 class="text-xl font-semibold mb-4 text-center">參與玩家 (<span id="playerCount">0</span>)</h3>
+                            <div class="bg-gray-800 bg-opacity-30 rounded-xl p-4 max-h-60 overflow-y-auto">
+                                <div id="playersList" class="space-y-3">
+                                    <p class="text-gray-400 text-center py-8">尚無玩家，請新增玩家</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="spinWheel()" class="golden-button px-10 py-4 text-xl mb-6">
+                            <i class="fas fa-sync-alt mr-3 animate-spin-once"></i>旋轉轉盤
+                        </button>
+                        
+                        <div id="wheelResult" class="result-display w-full max-w-md"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -614,7 +630,7 @@
         document.getElementById('home').classList.remove('hidden');
         
         // Initialize nav buttons
-        document.querySelectorAll('.nav-button').forEach(button => {
+        document.querySelectorAll('.nav-item').forEach(button => {
             button.classList.remove('active');
         });
         document.getElementById('nav-home').classList.add('active');
@@ -630,7 +646,7 @@
             });
             
             // Remove active class from all nav buttons
-            document.querySelectorAll('.nav-button').forEach(button => {
+            document.querySelectorAll('.nav-item').forEach(button => {
                 button.classList.remove('active');
             });
             
