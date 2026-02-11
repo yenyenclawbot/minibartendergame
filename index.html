@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Bartender Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #3A2E28;
+            color: #F5F5DC;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .golden-button {
+            background: linear-gradient(45deg, #D4AF37, #F9D342);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: #3A2E28;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .dice {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="glass-effect p-8 w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6">🍺 Mini Bartender Game 🍸</h1>
+        
+        <!-- Dice Game Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">🎲 骰子比大小</h2>
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="changeDiceCount(-1)" class="golden-button">-</button>
+                <span id="diceCount" class="text-lg">骰子數量: 2</span>
+                <button onclick="changeDiceCount(1)" class="golden-button">+</button>
+            </div>
+            <div id="diceContainer" class="dice-container"></div>
+            <button onclick="rollDice()" class="golden-button w-full mt-4">搖骰子</button>
+            <div id="diceResult" class="text-center mt-4 text-xl font-bold"></div>
+        </div>
+        
+        <!-- Ace in the Hole Game Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">🐉 射龍門 (Ace in the Hole)</h2>
+            <div class="flex justify-around mb-4">
+                <div id="leftCard" class="text-center">
+                    <div class="bg-white text-black p-4 rounded-lg w-16 h-24 mx-auto flex items-center justify-center">?</div>
+                    <p class="mt-2">左柱</p>
+                </div>
+                <div id="rightCard" class="text-center">
+                    <div class="bg-white text-black p-4 rounded-lg w-16 h-24 mx-auto flex items-center justify-center">?</div>
+                    <p class="mt-2">右柱</p>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button onclick="dealCards()" class="golden-button">發牌</button>
+                <button onclick="bet(true)" class="golden-button">下注</button>
+                <button onclick="bet(false)" class="golden-button">不下注</button>
+            </div>
+            <div id="aceResult" class="text-center mt-4 text-xl font-bold"></div>
+        </div>
+        
+        <!-- Lucky Wheel Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">🎡 幸運轉盤</h2>
+            <div class="mb-4">
+                <input type="text" id="playerName" placeholder="輸入玩家暱稱" class="w-full p-2 rounded bg-gray-700 text-white">
+                <select id="playerEmoji" class="w-full p-2 rounded bg-gray-700 text-white mt-2">
+                    <option value="">選擇你的動物</option>
+                    <option value="🐶">🐶 狗狗</option>
+                    <option value="🐱">🐱 貓咪</option>
+                    <option value="🐭">🐭 老鼠</option>
+                    <option value="🐹">🐹 天竺鼠</option>
+                    <option value="🐰">🐰 兔子</option>
+                    <option value="🦊">🦊 狐狸</option>
+                    <option value="🐻">🐻 熊熊</option>
+                    <option value="🐼">🐼 熊貓</option>
+                </select>
+            </div>
+            <button onclick="addPlayer()" class="golden-button w-full">新增玩家</button>
+            <div class="flex justify-center mt-4">
+                <div id="wheelPlayers" class="text-center">
+                    <!-- Players will be added here -->
+                </div>
+            </div>
+            <button onclick="spinWheel()" class="golden-button w-full mt-4">旋轉轉盤</button>
+            <div id="wheelResult" class="text-center mt-4 text-xl font-bold"></div>
+        </div>
+    </div>
+
+    <script>
+        let diceCount = 2;
+        let players = [];
+        let wheelSpinning = false;
+
+        // Dice Game Functions
+        function changeDiceCount(change) {
+            diceCount = Math.max(1, Math.min(6, diceCount + change));
+            document.getElementById('diceCount').textContent = `骰子數量: ${diceCount}`;
+        }
+
+        function rollDice() {
+            const container = document.getElementById('diceContainer');
+            container.innerHTML = '';
+            
+            let total = 0;
+            for (let i = 0; i < diceCount; i++) {
+                const die = document.createElement('div');
+                die.className = 'dice';
+                die.textContent = '?';
+                container.appendChild(die);
+                
+                // Animation effect
+                setTimeout(() => {
+                    const value = Math.floor(Math.random() * 6) + 1;
+                    die.textContent = value;
+                    total += value;
+                    
+                    // Add animation effect
+                    die.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        die.style.transform = 'scale(1)';
+                    }, 200);
+                }, i * 300);
+            }
+            
+            setTimeout(() => {
+                document.getElementById('diceResult').textContent = `總點數: ${total}`;
+            }, diceCount * 300);
+        }
+
+        // Ace in the Hole Functions
+        function dealCards() {
+            const leftCard = Math.floor(Math.random() * 13) + 1;
+            const rightCard = Math.floor(Math.random() * 13) + 1;
+            
+            document.querySelector('#leftCard div').textContent = leftCard;
+            document.querySelector('#rightCard div').textContent = rightCard;
+            
+            document.getElementById('aceResult').textContent = '';
+        }
+
+        function bet(isBet) {
+            const leftValue = parseInt(document.querySelector('#leftCard div').textContent);
+            const rightValue = parseInt(document.querySelector('#rightCard div').textContent);
+            
+            if (isNaN(leftValue) || isNaN(rightValue)) {
+                document.getElementById('aceResult').textContent = '請先發牌！';
+                return;
+            }
+            
+            const thirdCard = Math.floor(Math.random() * 13) + 1;
+            
+            let result = '';
+            if (thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) {
+                result = isBet ? '恭喜中獎！🎉' : '可惜沒下注 😢';
+            } else {
+                result = isBet ? '可惜沒中 😢' : '明智的選擇 😊';
+            }
+            
+            document.getElementById('aceResult').textContent = `${result} 第三張牌: ${thirdCard}`;
+        }
+
+        // Lucky Wheel Functions
+        function addPlayer() {
+            const nameInput = document.getElementById('playerName');
+            const emojiSelect = document.getElementById('playerEmoji');
+            
+            if (nameInput.value.trim() === '' || emojiSelect.value === '') {
+                alert('請輸入玩家暱稱並選擇動物！');
+                return;
+            }
+            
+            players.push({
+                name: nameInput.value.trim(),
+                emoji: emojiSelect.value
+            });
+            
+            nameInput.value = '';
+            emojiSelect.value = '';
+            
+            updatePlayerList();
+        }
+
+        function updatePlayerList() {
+            const container = document.getElementById('wheelPlayers');
+            container.innerHTML = '<h3 class="text-lg font-semibold mb-2">玩家列表:</h3>';
+            
+            players.forEach((player, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'flex items-center justify-center my-1';
+                playerDiv.innerHTML = `
+                    <span class="mr-2">${player.emoji}</span>
+                    <span>${player.name}</span>
+                    <button onclick="removePlayer(${index})" class="ml-2 text-red-500">🗑️</button>
+                `;
+                container.appendChild(playerDiv);
+            });
+        }
+
+        function removePlayer(index) {
+            players.splice(index, 1);
+            updatePlayerList();
+        }
+
+        function spinWheel() {
+            if (players.length < 2) {
+                alert('至少需要兩位玩家！');
+                return;
+            }
+            
+            if (wheelSpinning) return;
+            
+            wheelSpinning = true;
+            const resultElement = document.getElementById('wheelResult');
+            resultElement.textContent = '轉盤旋轉中...';
+            
+            // Simulate spinning animation
+            let spins = 0;
+            const maxSpins = 20;
+            const interval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * players.length);
+                resultElement.textContent = `當前: ${players[randomIndex].emoji} ${players[randomIndex].name}`;
+                spins++;
+                
+                if (spins >= maxSpins) {
+                    clearInterval(interval);
+                    const winnerIndex = Math.floor(Math.random() * players.length);
+                    const winner = players[winnerIndex];
+                    resultElement.textContent = `🏆 獲勝者: ${winner.emoji} ${winner.name}`;
+                    wheelSpinning = false;
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
