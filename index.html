@@ -642,6 +642,9 @@
                             <button onclick="showHelp('ace-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
+                            <button onclick="showStats('ace-stats')" class="golden-button px-8 py-3">
+                                <i class="fas fa-chart-bar mr-2"></i>統計
+                            </button>
                         </div>
                         
                         <div id="aceResult" class="result-display w-full max-w-md"></div>
@@ -715,6 +718,15 @@
         let diceCount = 2;
         let players = [];
         let wheelSpinning = false;
+        let aceWins = 0;
+        let aceLosses = 0;
+
+        // Load stats from localStorage
+        if (localStorage.getItem('aceStats')) {
+          const stats = JSON.parse(localStorage.getItem('aceStats'));
+          aceWins = stats.wins || 0;
+          aceLosses = stats.losses || 0;
+        }
         
         // Initialize sections
         document.querySelectorAll('.section-content').forEach(section => {
@@ -864,6 +876,24 @@
                 }
             }
             
+            // Increment wins/losses based on result
+            if ((thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) === isBet) {
+              if (isBet) {
+                aceWins++;
+              } else {
+                aceLosses++;
+              }
+            } else {
+              if (isBet) {
+                aceLosses++;
+              } else {
+                aceWins++; // Player correctly chose not to bet
+              }
+            }
+            
+            // Save updated stats
+            localStorage.setItem('aceStats', JSON.stringify({wins: aceWins, losses: aceLosses}));
+
             const resultElement = document.getElementById('aceResult');
             resultElement.innerHTML = `<div class="flex items-center justify-center ${resultClass}"><i class="fas fa-star mr-3"></i>${result} <span class="ml-2">(第三張牌: ${thirdCard})</span></div>`;
             
@@ -1003,6 +1033,16 @@
                 }
             });
         }
+        
+        // Statistics Functions
+        function showStats(modalId) {
+          // Update the displayed stats
+          if (modalId === 'ace-stats') {
+            document.getElementById('ace-wins').textContent = aceWins;
+            document.getElementById('ace-losses').textContent = aceLosses;
+          }
+          showHelp(modalId); // Reuse the showHelp logic
+        }
     </script>
     
     <!-- Dice Game Help Modal -->
@@ -1025,6 +1065,16 @@
             <p>首先發出左右兩張牌。</p>
             <p>您可以選擇下注或不下注。</p>
             <p>若下注，系統會再發一張牌，若該牌點數介於左右兩張牌之間，則算中獎。</p>
+        </div>
+    </div>
+
+    <!-- Ace in the Hole Stats Modal -->
+    <div id="ace-stats" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('ace-stats')">&times;</span>
+            <h2>射龍門 統計</h2>
+            <p>獲勝次數: <span id="ace-wins">0</span></p>
+            <p>失敗次數: <span id="ace-losses">0</span></p>
         </div>
     </div>
 
