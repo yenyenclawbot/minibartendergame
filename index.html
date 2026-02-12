@@ -18,6 +18,7 @@
         
         body {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            background-size: 400% 400%;
             color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
@@ -25,6 +26,7 @@
             padding: 0;
             overflow-x: hidden;
             position: relative;
+            animation: gradientShift 15s ease infinite;
         }
         
         body::before {
@@ -423,6 +425,32 @@
             font-size: 0.9rem;
             margin-top: 20px;
         }
+        
+        .shake {
+          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .pulse-winning {
+          animation: pulse-winning 2s infinite;
+        }
+
+        @keyframes pulse-winning {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -676,12 +704,40 @@
         }
 
         // Dice Game Functions
+        function playDiceSound() {
+          // Create audio context
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          
+          // Create oscillator and gain node
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          // Connect nodes
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          // Configure sound parameters (pleasant chime)
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Start frequency
+          oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3); // End frequency
+          
+          // Configure volume envelope
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01); // Quick attack
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3); // Decay
+          
+          // Play and stop
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }
+        
         function changeDiceCount(change) {
             diceCount = Math.max(1, Math.min(6, diceCount + change));
             document.getElementById('diceCount').textContent = `骰子數量: ${diceCount}`;
         }
 
         function rollDice() {
+            playDiceSound(); // Play sound effect
             const container = document.getElementById('diceContainer');
             container.innerHTML = '';
             
@@ -756,7 +812,16 @@
                 }
             }
             
-            document.getElementById('aceResult').innerHTML = `<div class="flex items-center justify-center ${resultClass}"><i class="fas fa-star mr-3"></i>${result} <span class="ml-2">(第三張牌: ${thirdCard})</span></div>`;
+            const resultElement = document.getElementById('aceResult');
+            resultElement.innerHTML = `<div class="flex items-center justify-center ${resultClass}"><i class="fas fa-star mr-3"></i>${result} <span class="ml-2">(第三張牌: ${thirdCard})</span></div>`;
+            
+            // Add shake animation to result element on win/loss
+            if (resultClass.includes('red') || resultClass.includes('green')) {
+              resultElement.classList.add('shake');
+              setTimeout(() => {
+                resultElement.classList.remove('shake');
+              }, 500);
+            }
         }
 
         // Lucky Wheel Functions
@@ -838,7 +903,15 @@
                     clearInterval(interval);
                     const winnerIndex = Math.floor(Math.random() * players.length);
                     const winner = players[winnerIndex];
-                    resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-crown text-2xl mr-3"></i><span class="text-2xl">🏆 獲勝者: ${winner.emoji} ${winner.name}</span></div>`;
+                    resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-crown text-2xl mr-3"></i><span id="winner-name" class="text-2xl">🏆 獲勝者: ${winner.emoji} ${winner.name}</span></div>`;
+                    
+                    // Add pulse animation to winner's name
+                    const winnerNameElement = document.getElementById('winner-name');
+                    winnerNameElement.classList.add('pulse-winning');
+                    setTimeout(() => {
+                      winnerNameElement.classList.remove('pulse-winning');
+                    }, 2000); // Duration of pulse animation
+                    
                     wheelSpinning = false;
                 }
             }, 100);
