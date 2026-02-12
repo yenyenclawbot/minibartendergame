@@ -606,6 +606,9 @@
                             <button onclick="showHelp('dice-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
+                            <button onclick="showDiceStats('dice-stats')" class="golden-button px-8 py-3">
+                                <i class="fas fa-chart-bar mr-2"></i>統計
+                            </button>
                         </div>
                         
                         <div id="diceResult" class="result-display w-full max-w-md"></div>
@@ -720,12 +723,20 @@
         let wheelSpinning = false;
         let aceWins = 0;
         let aceLosses = 0;
+        let diceRolls = 0;
+        let diceHighestScore = 0;
 
         // Load stats from localStorage
         if (localStorage.getItem('aceStats')) {
           const stats = JSON.parse(localStorage.getItem('aceStats'));
           aceWins = stats.wins || 0;
           aceLosses = stats.losses || 0;
+        }
+        
+        if (localStorage.getItem('diceStats')) {
+          const stats = JSON.parse(localStorage.getItem('diceStats'));
+          diceRolls = stats.rolls || 0;
+          diceHighestScore = stats.highestScore || 0;
         }
         
         // Initialize sections
@@ -828,6 +839,13 @@
                     }, 200);
                 }, i * 300);
             }
+            
+            // Update and save dice stats
+            diceRolls++;
+            if (total > diceHighestScore) {
+              diceHighestScore = total;
+            }
+            localStorage.setItem('diceStats', JSON.stringify({rolls: diceRolls, highestScore: diceHighestScore}));
             
             setTimeout(() => {
                 document.getElementById('diceResult').innerHTML = `<div class="flex items-center justify-center"><i class="fas fa-calculator text-2xl mr-3"></i><span>總點數: ${total}</span></div>`;
@@ -1043,6 +1061,15 @@
           }
           showHelp(modalId); // Reuse the showHelp logic
         }
+        
+        function showDiceStats(modalId) {
+          // Update the displayed stats
+          if (modalId === 'dice-stats') {
+            document.getElementById('dice-rolls').textContent = diceRolls;
+            document.getElementById('dice-highest-score').textContent = diceHighestScore;
+          }
+          showHelp(modalId); // Reuse the showHelp logic
+        }
     </script>
     
     <!-- Dice Game Help Modal -->
@@ -1053,6 +1080,16 @@
             <p>此遊戲透過投擲多顆骰子來比較總點數大小。</p>
             <p>您可以調整骰子數量（1-6顆）。</p>
             <p>點擊「搖骰子」按鈕進行遊戲。</p>
+        </div>
+    </div>
+
+    <!-- Dice Game Stats Modal -->
+    <div id="dice-stats" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dice-stats')">&times;</span>
+            <h2>骰子比大小 統計</h2>
+            <p>總共搖骰次數: <span id="dice-rolls">0</span></p>
+            <p>最高分數: <span id="dice-highest-score">0</span></p>
         </div>
     </div>
 
