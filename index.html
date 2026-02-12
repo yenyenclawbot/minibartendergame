@@ -451,6 +451,45 @@
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
+        
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+          background-color: var(--primary-dark);
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid var(--accent-gold);
+          border-radius: 10px;
+          width: 80%;
+          max-width: 500px;
+          color: var(--text-light);
+          position: relative;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close {
+          color: var(--text-light);
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+          position: absolute;
+          right: 10px;
+          top: 5px;
+          cursor: pointer;
+        }
+
+        .close:hover {
+          color: var(--accent-gold);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -560,9 +599,14 @@
                         
                         <div id="diceContainer" class="dice-container"></div>
                         
-                        <button onclick="rollDice()" class="golden-button px-10 py-4 text-xl mb-6">
-                            <i class="fas fa-dice mr-3"></i>搖骰子
-                        </button>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="rollDice()" class="golden-button px-10 py-4 text-xl">
+                                <i class="fas fa-dice mr-3"></i>搖骰子
+                            </button>
+                            <button onclick="showHelp('dice-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-question-circle mr-2"></i>說明
+                            </button>
+                        </div>
                         
                         <div id="diceResult" class="result-display w-full max-w-md"></div>
                     </div>
@@ -594,6 +638,9 @@
                             </button>
                             <button onclick="bet(false)" class="golden-button px-8 py-3">
                                 <i class="fas fa-times-circle mr-2"></i>不下注
+                            </button>
+                            <button onclick="showHelp('ace-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
                         </div>
                         
@@ -643,9 +690,14 @@
                             </div>
                         </div>
                         
-                        <button onclick="spinWheel()" class="golden-button px-10 py-4 text-xl mb-6">
-                            <i class="fas fa-sync-alt mr-3 animate-spin-once"></i>旋轉轉盤
-                        </button>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="spinWheel()" class="golden-button px-10 py-4 text-xl">
+                                <i class="fas fa-sync-alt mr-3 animate-spin-once"></i>旋轉轉盤
+                            </button>
+                            <button onclick="showHelp('wheel-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-question-circle mr-2"></i>說明
+                            </button>
+                        </div>
                         
                         <div id="wheelResult" class="result-display w-full max-w-md"></div>
                     </div>
@@ -932,6 +984,60 @@
             `;
             document.head.appendChild(style);
         });
+        
+        // Help Modal Functions
+        function showHelp(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal if clicked outside content
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
     </script>
+    
+    <!-- Dice Game Help Modal -->
+    <div id="dice-help" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dice-help')">&times;</span>
+            <h2>骰子比大小 說明</h2>
+            <p>此遊戲透過投擲多顆骰子來比較總點數大小。</p>
+            <p>您可以調整骰子數量（1-6顆）。</p>
+            <p>點擊「搖骰子」按鈕進行遊戲。</p>
+        </div>
+    </div>
+
+    <!-- Ace in the Hole Help Modal -->
+    <div id="ace-help" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('ace-help')">&times;</span>
+            <h2>射龍門 說明</h2>
+            <p>此遊戲使用撲克牌進行。</p>
+            <p>首先發出左右兩張牌。</p>
+            <p>您可以選擇下注或不下注。</p>
+            <p>若下注，系統會再發一張牌，若該牌點數介於左右兩張牌之間，則算中獎。</p>
+        </div>
+    </div>
+
+    <!-- Lucky Wheel Help Modal -->
+    <div id="wheel-help" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('wheel-help')">&times;</span>
+            <h2>幸運轉盤 說明</h2>
+            <p>此遊戲是一個轉盤抽獎遊戲。</p>
+            <p>首先新增參與玩家，每位玩家需設定暱稱和動物。</p>
+            <p>點擊「旋轉轉盤」按鈕開始遊戲。</p>
+            <p>轉盤停止後，隨機選出一位獲勝者。</p>
+        </div>
+    </div>
 </body>
 </html>
