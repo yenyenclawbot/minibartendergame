@@ -703,6 +703,9 @@
                             <button onclick="showHelp('wheel-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
+                            <button onclick="showWheelHistory('wheel-history')" class="golden-button px-8 py-3">
+                                <i class="fas fa-history mr-2"></i>歷史
+                            </button>
                         </div>
                         
                         <div id="wheelResult" class="result-display w-full max-w-md"></div>
@@ -725,6 +728,7 @@
         let aceLosses = 0;
         let diceRolls = 0;
         let diceHighestScore = 0;
+        let wheelWinnersHistory = [];
 
         // Load stats from localStorage
         if (localStorage.getItem('aceStats')) {
@@ -737,6 +741,10 @@
           const stats = JSON.parse(localStorage.getItem('diceStats'));
           diceRolls = stats.rolls || 0;
           diceHighestScore = stats.highestScore || 0;
+        }
+        
+        if (localStorage.getItem('wheelHistory')) {
+          wheelWinnersHistory = JSON.parse(localStorage.getItem('wheelHistory'));
         }
         
         // Initialize sections
@@ -1005,6 +1013,13 @@
                     const winner = players[winnerIndex];
                     resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-crown text-2xl mr-3"></i><span id="winner-name" class="text-2xl">🏆 獲勝者: ${winner.emoji} ${winner.name}</span></div>`;
                     
+                    // Add winner to history
+                    wheelWinnersHistory.unshift(`${winner.emoji} ${winner.name}`); // Add to the beginning
+                    if (wheelWinnersHistory.length > 10) {
+                      wheelWinnersHistory.pop(); // Keep only the last 10
+                    }
+                    localStorage.setItem('wheelHistory', JSON.stringify(wheelWinnersHistory)); // Save history
+                    
                     // Add pulse animation to winner's name
                     const winnerNameElement = document.getElementById('winner-name');
                     winnerNameElement.classList.add('pulse-winning');
@@ -1070,6 +1085,25 @@
           }
           showHelp(modalId); // Reuse the showHelp logic
         }
+        
+        function showWheelHistory(modalId) {
+          // Update the displayed history
+          if (modalId === 'wheel-history') {
+            const historyList = document.getElementById('wheel-history-list');
+            historyList.innerHTML = ''; // Clear the list
+            
+            if (wheelWinnersHistory.length === 0) {
+              historyList.innerHTML = '<li>尚無歷史記錄</li>';
+            } else {
+              wheelWinnersHistory.forEach(winner => {
+                const li = document.createElement('li');
+                li.textContent = winner;
+                historyList.appendChild(li);
+              });
+            }
+          }
+          showHelp(modalId); // Reuse the showHelp logic
+        }
     </script>
     
     <!-- Dice Game Help Modal -->
@@ -1124,6 +1158,17 @@
             <p>首先新增參與玩家，每位玩家需設定暱稱和動物。</p>
             <p>點擊「旋轉轉盤」按鈕開始遊戲。</p>
             <p>轉盤停止後，隨機選出一位獲勝者。</p>
+        </div>
+    </div>
+
+    <!-- Lucky Wheel History Modal -->
+    <div id="wheel-history" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('wheel-history')">&times;</span>
+            <h2>幸運轉盤 歷史</h2>
+            <ul id="wheel-history-list">
+                <!-- History items will be inserted here by JavaScript -->
+            </ul>
         </div>
     </div>
 </body>
