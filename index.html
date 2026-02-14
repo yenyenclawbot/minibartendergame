@@ -496,6 +496,15 @@
           padding: 5px;
           border-bottom: 1px solid var(--accent-gold);
         }
+        
+        .leaderboard-item {
+          margin-bottom: 5px;
+          padding: 3px;
+        }
+        
+        .leaderboard-section {
+          margin-bottom: 20px;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -531,6 +540,10 @@
                     <div class="nav-item" onclick="showAchievements()" id="nav-achievements">
                         <i class="fas fa-trophy"></i>
                         <span>成就</span>
+                    </div>
+                    <div class="nav-item" onclick="showLeaderboard()" id="nav-leaderboard">
+                        <i class="fas fa-list-ol"></i>
+                        <span>排行榜</span>
                     </div>
                 </div>
             </div>
@@ -741,6 +754,8 @@
         let wheelWinnersHistory = [];
         let wheelWins = 0; // Track total wins for wheel game achievement
         let unlockedAchievements = {};
+        let diceHighScoreLeaderboard = []; // Array of {nickname, score}
+        let aceWinRateLeaderboard = []; // Array of {nickname, rate}
 
         // Load stats from localStorage
         if (localStorage.getItem('aceStats')) {
@@ -764,6 +779,15 @@
         // Load unlocked achievements from localStorage
         if (localStorage.getItem('unlockedAchievements')) {
           unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements'));
+        }
+        
+        // Load leaderboards from localStorage
+        if (localStorage.getItem('diceHighScoreLeaderboard')) {
+          diceHighScoreLeaderboard = JSON.parse(localStorage.getItem('diceHighScoreLeaderboard'));
+        }
+        
+        if (localStorage.getItem('aceWinRateLeaderboard')) {
+          aceWinRateLeaderboard = JSON.parse(localStorage.getItem('aceWinRateLeaderboard'));
         }
         
         // Initialize sections
@@ -879,6 +903,11 @@
               unlockAchievement('lucky_number');
             }
             
+            // Update leaderboard if current user's score is higher than their previous high or if no previous entry exists
+            if (diceNickname && total > (getDiceHighScoreForNickname(diceNickname) || 0)) {
+              updateDiceHighScoreLeaderboard(diceNickname, total);
+            }
+            
             setTimeout(() => {
                 document.getElementById('diceResult').innerHTML = `<div class="flex items-center justify-center"><i class="fas fa-calculator text-2xl mr-3"></i><span>總點數: ${total}</span></div>`;
             }, diceCount * 300);
@@ -950,6 +979,11 @@
             // Check for achievements
             if (wasWin && aceWins === 1) { // First win condition
               unlockAchievement('first_win');
+            }
+            
+            // Update leaderboard if nickname exists
+            if (aceNickname) {
+              updateAceWinRateLeaderboard(aceNickname, aceWins, (aceWins + aceLosses));
             }
 
             const resultElement = document.getElementById('aceResult');
@@ -1111,8 +1145,7 @@
         function showStats(modalId) {
           // Update the displayed stats
           if (modalId === 'ace-stats') {
-            document.getElementById('ace-wins').textContent = aceWins;
-            document.getElementById('ace-losses').textContent = aceLosses;
+            updateAceStatsDisplay(); // Use the new function
           }
           showHelp(modalId); // Reuse the showHelp logic
         }
@@ -1120,8 +1153,7 @@
         function showDiceStats(modalId) {
           // Update the displayed stats
           if (modalId === 'dice-stats') {
-            document.getElementById('dice-rolls').textContent = diceRolls;
-            document.getElementById('dice-highest-score').textContent = diceHighestScore;
+            updateDiceStatsDisplay(); // Use the new function
           }
           showHelp(modalId); // Reuse the showHelp logic
         }
@@ -1191,6 +1223,161 @@
           
           // Optionally, close the modal after reset
           closeModal('wheel-history');
+        }
+        
+        // Leaderboard and Nickname Functions
+        
+        // Load nicknames from localStorage on startup
+        let diceNickname = localStorage.getItem('diceNickname') || '';
+        let aceNickname = localStorage.getItem('aceNickname') || '';
+
+        function saveDiceNickname() {
+          const input = document.getElementById('dice-nickname-input');
+          if (input && input.value.trim()) {
+            diceNickname = input.value.trim();
+            localStorage.setItem('diceNickname', diceNickname);
+          }
+        }
+        
+        function saveAceNickname() {
+          const input = document.getElementById('ace-nickname-input');
+          if (input && input.value.trim()) {
+            aceNickname = input.value.trim();
+            localStorage.setItem('aceNickname', aceNickname);
+          }
+        }
+        
+        function updateDiceStatsDisplay() {
+          // This function updates the stats display with the current values
+          // It's called after saving nickname or when the modal is opened
+          document.getElementById('dice-rolls').textContent = diceRolls;
+          document.getElementById('dice-highest-score').textContent = diceHighestScore;
+          document.getElementById('dice-nickname-input').value = diceNickname;
+        }
+        
+        function updateAceStatsDisplay() {
+          // This function updates the stats display with the current values
+          // It's called after saving nickname or when the modal is opened
+          document.getElementById('ace-wins').textContent = aceWins;
+          document.getElementById('ace-losses').textContent = aceLosses;
+          document.getElementById('ace-nickname-input').value = aceNickname;
+        }
+        
+        // Helper functions for leaderboards
+        
+        function getDiceHighScoreForNickname(nickname) {
+          const entry = diceHighScoreLeaderboard.find(item => item.nickname === nickname);
+          return entry ? entry.score : null;
+        }
+        
+        function updateDiceHighScoreLeaderboard(nickname, newScore) {
+          // Find existing entry
+          const existingEntryIndex = diceHighScoreLeaderboard.findIndex(item => item.nickname === nickname);
+          
+          if (existingEntryIndex !== -1) {
+            // Update existing entry if new score is higher
+            if (newScore > diceHighScoreLeaderboard[existingEntryIndex].score) {
+              diceHighScoreLeaderboard[existingEntryIndex].score = newScore;
+            }
+          } else {
+            // Add new entry
+            diceHighScoreLeaderboard.push({ nickname: nickname, score: newScore });
+          }
+          
+          // Sort leaderboard by score descending
+          diceHighScoreLeaderboard.sort((a, b) => b.score - a.score);
+          
+          // Keep only top 10
+          if (diceHighScoreLeaderboard.length > 10) {
+            diceHighScoreLeaderboard = diceHighScoreLeaderboard.slice(0, 10);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('diceHighScoreLeaderboard', JSON.stringify(diceHighScoreLeaderboard));
+        }
+        
+        function getAceWinRateForNickname(nickname) {
+          const entry = aceWinRateLeaderboard.find(item => item.nickname === nickname);
+          return entry ? entry.rate : null;
+        }
+        
+        function updateAceWinRateLeaderboard(nickname, wins, totalGames) {
+          if (totalGames === 0) return; // Avoid division by zero
+          
+          const winRate = (wins / totalGames) * 100;
+          
+          // Find existing entry
+          const existingEntryIndex = aceWinRateLeaderboard.findIndex(item => item.nickname === nickname);
+          
+          if (existingEntryIndex !== -1) {
+            // Update existing entry
+            aceWinRateLeaderboard[existingEntryIndex].wins = wins;
+            aceWinRateLeaderboard[existingEntryIndex].totalGames = totalGames;
+            aceWinRateLeaderboard[existingEntryIndex].rate = winRate;
+          } else {
+            // Add new entry
+            aceWinRateLeaderboard.push({ nickname: nickname, wins: wins, totalGames: totalGames, rate: winRate });
+          }
+          
+          // Sort leaderboard by win rate descending
+          aceWinRateLeaderboard.sort((a, b) => b.rate - a.rate);
+          
+          // Keep only top 10
+          if (aceWinRateLeaderboard.length > 10) {
+            aceWinRateLeaderboard = aceWinRateLeaderboard.slice(0, 10);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('aceWinRateLeaderboard', JSON.stringify(aceWinRateLeaderboard));
+        }
+        
+        function showLeaderboard() {
+          const leaderboardModalId = 'leaderboard-modal';
+          const diceListId = 'leaderboard-dice-list';
+          const aceListId = 'leaderboard-ace-list';
+          
+          // Get the modal and list elements
+          const modal = document.getElementById(leaderboardModalId);
+          const diceList = document.getElementById(diceListId);
+          const aceList = document.getElementById(aceListId);
+          
+          if (!modal || !diceList || !aceList) {
+            console.error('Leaderboard modal or list elements not found.');
+            return;
+          }
+          
+          // Clear the lists
+          diceList.innerHTML = '';
+          aceList.innerHTML = '';
+          
+          // Populate dice high score leaderboard
+          diceList.innerHTML = '<h3>骰子比大小 - 最高分數</h3>';
+          if (diceHighScoreLeaderboard.length === 0) {
+             diceList.innerHTML += '<p>尚無資料</p>';
+          } else {
+            diceHighScoreLeaderboard.forEach((entry, index) => {
+              const li = document.createElement('li');
+              li.className = 'leaderboard-item';
+              li.innerHTML = `<strong>${index + 1}. ${entry.nickname}</strong>: ${entry.score}`;
+              diceList.appendChild(li);
+            });
+          }
+          
+          // Populate ace win rate leaderboard
+          aceList.innerHTML = '<h3>射龍門 - 勝率</h3>';
+          if (aceWinRateLeaderboard.length === 0) {
+             aceList.innerHTML += '<p>尚無資料</p>';
+          } else {
+            aceWinRateLeaderboard.forEach((entry, index) => {
+              const li = document.createElement('li');
+              li.className = 'leaderboard-item';
+              li.innerHTML = `<strong>${index + 1}. ${entry.nickname}</strong>: ${(entry.rate).toFixed(2)}% (${entry.wins}/${entry.totalGames})`;
+              aceList.appendChild(li);
+            });
+          }
+          
+          // Show the modal using the existing showHelp logic
+          showHelp(leaderboardModalId);
         }
         
         function unlockAchievement(key) {
@@ -1298,8 +1485,12 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('dice-stats')">&times;</span>
             <h2>骰子比大小 統計</h2>
+            <p>您的暱稱: <input type="text" id="dice-nickname-input" placeholder="輸入您的暱稱" maxlength="20"></p>
             <p>總共搖骰次數: <span id="dice-rolls">0</span></p>
             <p>最高分數: <span id="dice-highest-score">0</span></p>
+            <button onclick="saveDiceNickname(); updateDiceStatsDisplay();" class="golden-button px-8 py-3 mt-2">
+                <i class="fas fa-save mr-2"></i>儲存暱稱
+            </button>
             <button onclick="resetDiceStats()" class="golden-button px-8 py-3 mt-4">
                 <i class="fas fa-redo mr-2"></i>重置統計
             </button>
@@ -1323,8 +1514,12 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('ace-stats')">&times;</span>
             <h2>射龍門 統計</h2>
+            <p>您的暱稱: <input type="text" id="ace-nickname-input" placeholder="輸入您的暱稱" maxlength="20"></p>
             <p>獲勝次數: <span id="ace-wins">0</span></p>
             <p>失敗次數: <span id="ace-losses">0</span></p>
+            <button onclick="saveAceNickname(); updateAceStatsDisplay();" class="golden-button px-8 py-3 mt-2">
+                <i class="fas fa-save mr-2"></i>儲存暱稱
+            </button>
             <button onclick="resetAceStats()" class="golden-button px-8 py-3 mt-4">
                 <i class="fas fa-redo mr-2"></i>重置統計
             </button>
@@ -1364,6 +1559,24 @@
             <ul id="achievements-list">
                 <!-- Achievement items will be inserted here by JavaScript -->
             </ul>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('leaderboard-modal')">&times;</span>
+            <h2>排行榜</h2>
+            <div class="leaderboard-section">
+                <ul id="leaderboard-dice-list">
+                    <!-- Dice leaderboard items will be inserted here by JavaScript -->
+                </ul>
+            </div>
+            <div class="leaderboard-section">
+                <ul id="leaderboard-ace-list">
+                    <!-- Ace leaderboard items will be inserted here by JavaScript -->
+                </ul>
+            </div>
         </div>
     </div>
 </body>
