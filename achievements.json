@@ -1,0 +1,17 @@
+{
+  "first_win": {
+    "name": "首戰告捷",
+    "description": "在射龍門遊戲中首次獲勝",
+    "unlocked": false
+  },
+  "lucky_number": {
+    "name": "幸運18",
+    "description": "在骰子比大小中一次獲得18點",
+    "unlocked": false
+  },
+  "wheel_spin_master": {
+    "name": "轉盤大師",
+    "description": "在幸運轉盤中獲勝5次",
+    "unlocked": false
+  }
+}

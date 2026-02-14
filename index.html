@@ -490,6 +490,12 @@
         .close:hover {
           color: var(--accent-gold);
         }
+        
+        .achievement-item {
+          margin-bottom: 10px;
+          padding: 5px;
+          border-bottom: 1px solid var(--accent-gold);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -521,6 +527,10 @@
                     <div class="nav-item" onclick="showSection('wheel')" id="nav-wheel">
                         <i class="fas fa-circle-notch"></i>
                         <span>幸運轉盤</span>
+                    </div>
+                    <div class="nav-item" onclick="showAchievements()" id="nav-achievements">
+                        <i class="fas fa-trophy"></i>
+                        <span>成就</span>
                     </div>
                 </div>
             </div>
@@ -729,6 +739,8 @@
         let diceRolls = 0;
         let diceHighestScore = 0;
         let wheelWinnersHistory = [];
+        let wheelWins = 0; // Track total wins for wheel game achievement
+        let unlockedAchievements = {};
 
         // Load stats from localStorage
         if (localStorage.getItem('aceStats')) {
@@ -745,6 +757,13 @@
         
         if (localStorage.getItem('wheelHistory')) {
           wheelWinnersHistory = JSON.parse(localStorage.getItem('wheelHistory'));
+          // Calculate wheelWins from history on load, assuming history only stores wins
+          wheelWins = wheelWinnersHistory.length;
+        }
+        
+        // Load unlocked achievements from localStorage
+        if (localStorage.getItem('unlockedAchievements')) {
+          unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements'));
         }
         
         // Initialize sections
@@ -855,6 +874,11 @@
             }
             localStorage.setItem('diceStats', JSON.stringify({rolls: diceRolls, highestScore: diceHighestScore}));
             
+            // Check for achievements
+            if (total === 18) { // Lucky number 18 (assuming 6 dice, each showing 3, or other combinations reaching 18 with <=6 dice)
+              unlockAchievement('lucky_number');
+            }
+            
             setTimeout(() => {
                 document.getElementById('diceResult').innerHTML = `<div class="flex items-center justify-center"><i class="fas fa-calculator text-2xl mr-3"></i><span>總點數: ${total}</span></div>`;
             }, diceCount * 300);
@@ -903,9 +927,11 @@
             }
             
             // Increment wins/losses based on result
+            let wasWin = false; // Track if this specific bet was a win
             if ((thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) === isBet) {
               if (isBet) {
                 aceWins++;
+                wasWin = true;
               } else {
                 aceLosses++;
               }
@@ -914,11 +940,17 @@
                 aceLosses++;
               } else {
                 aceWins++; // Player correctly chose not to bet
+                wasWin = true; // Count this as a "win" for not betting correctly
               }
             }
             
             // Save updated stats
             localStorage.setItem('aceStats', JSON.stringify({wins: aceWins, losses: aceLosses}));
+            
+            // Check for achievements
+            if (wasWin && aceWins === 1) { // First win condition
+              unlockAchievement('first_win');
+            }
 
             const resultElement = document.getElementById('aceResult');
             resultElement.innerHTML = `<div class="flex items-center justify-center ${resultClass}"><i class="fas fa-star mr-3"></i>${result} <span class="ml-2">(第三張牌: ${thirdCard})</span></div>`;
@@ -1020,6 +1052,14 @@
                     }
                     localStorage.setItem('wheelHistory', JSON.stringify(wheelWinnersHistory)); // Save history
                     
+                    // Increment total wheel wins
+                    wheelWins++;
+                    
+                    // Check for achievements
+                    if (wheelWins === 5) { // Wheel spin master condition
+                      unlockAchievement('wheel_spin_master');
+                    }
+                    
                     // Add pulse animation to winner's name
                     const winnerNameElement = document.getElementById('winner-name');
                     winnerNameElement.classList.add('pulse-winning');
@@ -1086,6 +1126,22 @@
           showHelp(modalId); // Reuse the showHelp logic
         }
         
+        function resetAceStats() {
+          // Reset stats
+          aceWins = 0;
+          aceLosses = 0;
+          
+          // Save to localStorage
+          localStorage.removeItem('aceStats'); // Or set to default values: localStorage.setItem('aceStats', JSON.stringify({wins: 0, losses: 0}));
+          
+          // Update display
+          document.getElementById('ace-wins').textContent = aceWins;
+          document.getElementById('ace-losses').textContent = aceLosses;
+          
+          // Optionally, close the modal after reset
+          closeModal('ace-stats');
+        }
+        
         function showWheelHistory(modalId) {
           // Update the displayed history
           if (modalId === 'wheel-history') {
@@ -1103,6 +1159,126 @@
             }
           }
           showHelp(modalId); // Reuse the showHelp logic
+        }
+        
+        function resetDiceStats() {
+          // Reset stats
+          diceRolls = 0;
+          diceHighestScore = 0;
+          
+          // Save to localStorage
+          localStorage.removeItem('diceStats'); // Or set to default values: localStorage.setItem('diceStats', JSON.stringify({rolls: 0, highestScore: 0}));
+          
+          // Update display
+          document.getElementById('dice-rolls').textContent = diceRolls;
+          document.getElementById('dice-highest-score').textContent = diceHighestScore;
+          
+          // Optionally, close the modal after reset
+          closeModal('dice-stats');
+        }
+        
+        function resetWheelHistory() {
+          // Reset history
+          wheelWinnersHistory = [];
+          
+          // Save to localStorage
+          localStorage.removeItem('wheelHistory'); // Or set to default values: localStorage.setItem('wheelHistory', JSON.stringify([]));
+          
+          // Update display (this will be handled by showWheelHistory when the modal is reopened)
+          // For immediate visual feedback, we can clear the list here as well
+          const historyList = document.getElementById('wheel-history-list');
+          historyList.innerHTML = '<li>尚無歷史記錄</li>';
+          
+          // Optionally, close the modal after reset
+          closeModal('wheel-history');
+        }
+        
+        function unlockAchievement(key) {
+          // Load achievement definitions from the external JSON file
+          // Since we cannot directly fetch JSON in this context, we'll define them here or simulate.
+          // For simplicity in this implementation, we'll define them as a constant object here.
+          const achievementsDefinition = {
+            "first_win": {
+              "name": "首戰告捷",
+              "description": "在射龍門遊戲中首次獲勝",
+              "unlocked": false
+            },
+            "lucky_number": {
+              "name": "幸運18",
+              "description": "在骰子比大小中一次獲得18點",
+              "unlocked": false
+            },
+            "wheel_spin_master": {
+              "name": "轉盤大師",
+              "description": "在幸運轉盤中獲勝5次",
+              "unlocked": false
+            }
+          };
+          
+          if (!unlockedAchievements[key] && achievementsDefinition[key]) {
+            unlockedAchievements[key] = true;
+            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            // Potentially show a notification to the user
+            alert(`恭喜解鎖成就: ${achievementsDefinition[key].name} - ${achievementsDefinition[key].description}`);
+          }
+        }
+        
+        function showAchievements() {
+          // This function will toggle the achievements modal
+          // We need to create the modal content dynamically based on unlockedAchievements
+          // Or simply reuse the showHelp/closeModal logic with a new modal ID
+          // First, ensure the modal exists in HTML
+          // Then populate its content based on unlockedAchievements
+          // For this, I'll assume an achievements modal exists and update its content
+          
+          const achievementsModalId = 'achievements-modal';
+          const achievementsListId = 'achievements-list';
+          
+          // Get the modal and list elements
+          const modal = document.getElementById(achievementsModalId);
+          const list = document.getElementById(achievementsListId);
+          
+          if (!modal || !list) {
+            console.error('Achievements modal or list element not found.');
+            return;
+          }
+          
+          // Clear the list
+          list.innerHTML = '';
+          
+          // Define achievement definitions (same as in unlockAchievement)
+          const achievementsDefinition = {
+            "first_win": {
+              "name": "首戰告捷",
+              "description": "在射龍門遊戲中首次獲勝",
+              "unlocked": false
+            },
+            "lucky_number": {
+              "name": "幸運18",
+              "description": "在骰子比大小中一次獲得18點",
+              "unlocked": false
+            },
+            "wheel_spin_master": {
+              "name": "轉盤大師",
+              "description": "在幸運轉盤中獲勝5次",
+              "unlocked": false
+            }
+          };
+          
+          // Populate the list
+          for (const [key, def] of Object.entries(achievementsDefinition)) {
+            const li = document.createElement('li');
+            li.className = 'achievement-item';
+            if (unlockedAchievements[key]) {
+              li.innerHTML = `<strong class="text-green-400">✓ ${def.name}</strong><br><small class="text-gray-400">${def.description}</small>`;
+            } else {
+              li.innerHTML = `<span class="text-gray-500">🔒 ${def.name}</span><br><small class="text-gray-600">???</small>`;
+            }
+            list.appendChild(li);
+          }
+          
+          // Show the modal using the existing showHelp logic
+          showHelp(achievementsModalId);
         }
     </script>
     
@@ -1124,6 +1300,9 @@
             <h2>骰子比大小 統計</h2>
             <p>總共搖骰次數: <span id="dice-rolls">0</span></p>
             <p>最高分數: <span id="dice-highest-score">0</span></p>
+            <button onclick="resetDiceStats()" class="golden-button px-8 py-3 mt-4">
+                <i class="fas fa-redo mr-2"></i>重置統計
+            </button>
         </div>
     </div>
 
@@ -1146,6 +1325,9 @@
             <h2>射龍門 統計</h2>
             <p>獲勝次數: <span id="ace-wins">0</span></p>
             <p>失敗次數: <span id="ace-losses">0</span></p>
+            <button onclick="resetAceStats()" class="golden-button px-8 py-3 mt-4">
+                <i class="fas fa-redo mr-2"></i>重置統計
+            </button>
         </div>
     </div>
 
@@ -1168,6 +1350,19 @@
             <h2>幸運轉盤 歷史</h2>
             <ul id="wheel-history-list">
                 <!-- History items will be inserted here by JavaScript -->
+            </ul>
+            <button onclick="resetWheelHistory()" class="golden-button px-8 py-3 mt-4">
+                <i class="fas fa-redo mr-2"></i>重置歷史
+            </button>
+        </div>
+    </div>
+    <!-- Achievements Modal -->
+    <div id="achievements-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('achievements-modal')">&times;</span>
+            <h2>成就</h2>
+            <ul id="achievements-list">
+                <!-- Achievement items will be inserted here by JavaScript -->
             </ul>
         </div>
     </div>
