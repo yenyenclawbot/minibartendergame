@@ -629,8 +629,8 @@
                             <button onclick="showHelp('dice-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
-                            <button onclick="showDiceStats('dice-stats')" class="golden-button px-8 py-3">
-                                <i class="fas fa-chart-bar mr-2"></i>統計
+                            <button onclick="showHelp('dice-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-info-circle mr-2"></i>說明
                             </button>
                         </div>
                         
@@ -668,8 +668,8 @@
                             <button onclick="showHelp('ace-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
-                            <button onclick="showStats('ace-stats')" class="golden-button px-8 py-3">
-                                <i class="fas fa-chart-bar mr-2"></i>統計
+                            <button onclick="showHelp('ace-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-info-circle mr-2"></i>說明
                             </button>
                         </div>
                         
@@ -726,8 +726,8 @@
                             <button onclick="showHelp('wheel-help')" class="golden-button px-8 py-3">
                                 <i class="fas fa-question-circle mr-2"></i>說明
                             </button>
-                            <button onclick="showWheelHistory('wheel-history')" class="golden-button px-8 py-3">
-                                <i class="fas fa-history mr-2"></i>歷史
+                            <button onclick="showHelp('wheel-help')" class="golden-button px-8 py-3">
+                                <i class="fas fa-info-circle mr-2"></i>說明
                             </button>
                         </div>
                         
@@ -738,7 +738,7 @@
         </div>
         
         <div class="footer-version">
-            <p>Mini Bartender Game v1.0.0 | yenyenclawbot</p>
+            <p>Mini Bartender Game - Simple Fun Edition | yenyenclawbot</p>
         </div>
     </div>
 
@@ -747,47 +747,9 @@
         let diceCount = 2;
         let players = [];
         let wheelSpinning = false;
-        let aceWins = 0;
-        let aceLosses = 0;
-        let diceRolls = 0;
-        let diceHighestScore = 0;
-        let wheelWinnersHistory = [];
-        let wheelWins = 0; // Track total wins for wheel game achievement
-        let unlockedAchievements = {};
-        let diceHighScoreLeaderboard = []; // Array of {nickname, score}
-        let aceWinRateLeaderboard = []; // Array of {nickname, rate}
 
-        // Load stats from localStorage
-        if (localStorage.getItem('aceStats')) {
-          const stats = JSON.parse(localStorage.getItem('aceStats'));
-          aceWins = stats.wins || 0;
-          aceLosses = stats.losses || 0;
         }
         
-        if (localStorage.getItem('diceStats')) {
-          const stats = JSON.parse(localStorage.getItem('diceStats'));
-          diceRolls = stats.rolls || 0;
-          diceHighestScore = stats.highestScore || 0;
-        }
-        
-        if (localStorage.getItem('wheelHistory')) {
-          wheelWinnersHistory = JSON.parse(localStorage.getItem('wheelHistory'));
-          // Calculate wheelWins from history on load, assuming history only stores wins
-          wheelWins = wheelWinnersHistory.length;
-        }
-        
-        // Load unlocked achievements from localStorage
-        if (localStorage.getItem('unlockedAchievements')) {
-          unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements'));
-        }
-        
-        // Load leaderboards from localStorage
-        if (localStorage.getItem('diceHighScoreLeaderboard')) {
-          diceHighScoreLeaderboard = JSON.parse(localStorage.getItem('diceHighScoreLeaderboard'));
-        }
-        
-        if (localStorage.getItem('aceWinRateLeaderboard')) {
-          aceWinRateLeaderboard = JSON.parse(localStorage.getItem('aceWinRateLeaderboard'));
         }
         
         // Initialize sections
@@ -891,21 +853,10 @@
                 }, i * 300);
             }
             
-            // Update and save dice stats
-            diceRolls++;
-            if (total > diceHighestScore) {
-              diceHighestScore = total;
-            }
-            localStorage.setItem('diceStats', JSON.stringify({rolls: diceRolls, highestScore: diceHighestScore}));
-            
-            // Check for achievements
-            if (total === 18) { // Lucky number 18 (assuming 6 dice, each showing 3, or other combinations reaching 18 with <=6 dice)
-              unlockAchievement('lucky_number');
-            }
-            
-            // Update leaderboard if current user's score is higher than their previous high or if no previous entry exists
-            if (diceNickname && total > (getDiceHighScoreForNickname(diceNickname) || 0)) {
-              updateDiceHighScoreLeaderboard(diceNickname, total);
+            // Play dice roll sound
+            if (typeof diceSound !== 'undefined') {
+                diceSound.currentTime = 0;
+                diceSound.play().catch(e => console.log("Audio play failed:", e));
             }
             
             setTimeout(() => {
@@ -955,30 +906,30 @@
                 }
             }
             
-            // Increment wins/losses based on result
-            let wasWin = false; // Track if this specific bet was a win
+            // Determine win/loss for animation
+            let isWin = false;
             if ((thirdCard > Math.min(leftValue, rightValue) && thirdCard < Math.max(leftValue, rightValue)) === isBet) {
               if (isBet) {
-                aceWins++;
-                wasWin = true;
+                isWin = true;
               } else {
-                aceLosses++;
+                // Loss - player bet incorrectly
               }
             } else {
               if (isBet) {
-                aceLosses++;
+                // Loss - player bet incorrectly
               } else {
-                aceWins++; // Player correctly chose not to bet
-                wasWin = true; // Count this as a "win" for not betting correctly
+                isWin = true; // Win - player correctly chose not to bet
               }
             }
             
-            // Save updated stats
-            localStorage.setItem('aceStats', JSON.stringify({wins: aceWins, losses: aceLosses}));
-            
-            // Check for achievements
-            if (wasWin && aceWins === 1) { // First win condition
-              unlockAchievement('first_win');
+            // Apply shake animation based on result
+            const resultElement = document.getElementById('ace-result');
+            if (isWin) {
+                resultElement.classList.add('result-win-shake');
+                setTimeout(() => resultElement.classList.remove('result-win-shake'), 1000);
+            } else {
+                resultElement.classList.add('result-lose-shake');
+                setTimeout(() => resultElement.classList.remove('result-lose-shake'), 1000);
             }
             
             // Update leaderboard if nickname exists
@@ -1079,20 +1030,12 @@
                     const winner = players[winnerIndex];
                     resultElement.innerHTML = `<div class="flex items-center justify-center text-yellow-400"><i class="fas fa-crown text-2xl mr-3"></i><span id="winner-name" class="text-2xl">🏆 獲勝者: ${winner.emoji} ${winner.name}</span></div>`;
                     
-                    // Add winner to history
-                    wheelWinnersHistory.unshift(`${winner.emoji} ${winner.name}`); // Add to the beginning
-                    if (wheelWinnersHistory.length > 10) {
-                      wheelWinnersHistory.pop(); // Keep only the last 10
-                    }
-                    localStorage.setItem('wheelHistory', JSON.stringify(wheelWinnersHistory)); // Save history
-                    
-                    // Increment total wheel wins
-                    wheelWins++;
-                    
-                    // Check for achievements
-                    if (wheelWins === 5) { // Wheel spin master condition
-                      unlockAchievement('wheel_spin_master');
-                    }
+                    // Pulse animation for winner
+                    const winnerNameElement = document.getElementById('winner-name');
+                    winnerNameElement.classList.add('pulse-winning');
+                    setTimeout(() => {
+                      winnerNameElement.classList.remove('pulse-winning');
+                    }, 2000); // Duration of pulse animation
                     
                     // Add pulse animation to winner's name
                     const winnerNameElement = document.getElementById('winner-name');
@@ -1142,278 +1085,45 @@
         }
         
         // Statistics Functions
-        function showStats(modalId) {
-          // Update the displayed stats
-          if (modalId === 'ace-stats') {
-            updateAceStatsDisplay(); // Use the new function
-          }
-          showHelp(modalId); // Reuse the showHelp logic
         }
         
-        function showDiceStats(modalId) {
-          // Update the displayed stats
-          if (modalId === 'dice-stats') {
-            updateDiceStatsDisplay(); // Use the new function
-          }
-          showHelp(modalId); // Reuse the showHelp logic
         }
         
-        function resetAceStats() {
-          // Reset stats
-          aceWins = 0;
-          aceLosses = 0;
-          
-          // Save to localStorage
-          localStorage.removeItem('aceStats'); // Or set to default values: localStorage.setItem('aceStats', JSON.stringify({wins: 0, losses: 0}));
-          
-          // Update display
-          document.getElementById('ace-wins').textContent = aceWins;
-          document.getElementById('ace-losses').textContent = aceLosses;
-          
-          // Optionally, close the modal after reset
-          closeModal('ace-stats');
-        }
-        
-        function showWheelHistory(modalId) {
-          // Update the displayed history
-          if (modalId === 'wheel-history') {
-            const historyList = document.getElementById('wheel-history-list');
-            historyList.innerHTML = ''; // Clear the list
-            
-            if (wheelWinnersHistory.length === 0) {
-              historyList.innerHTML = '<li>尚無歷史記錄</li>';
-            } else {
-              wheelWinnersHistory.forEach(winner => {
-                const li = document.createElement('li');
-                li.textContent = winner;
-                historyList.appendChild(li);
-              });
-            }
-          }
-          showHelp(modalId); // Reuse the showHelp logic
-        }
-        
-        function resetDiceStats() {
-          // Reset stats
-          diceRolls = 0;
-          diceHighestScore = 0;
-          
-          // Save to localStorage
-          localStorage.removeItem('diceStats'); // Or set to default values: localStorage.setItem('diceStats', JSON.stringify({rolls: 0, highestScore: 0}));
-          
-          // Update display
-          document.getElementById('dice-rolls').textContent = diceRolls;
-          document.getElementById('dice-highest-score').textContent = diceHighestScore;
-          
-          // Optionally, close the modal after reset
-          closeModal('dice-stats');
-        }
-        
-        function resetWheelHistory() {
-          // Reset history
-          wheelWinnersHistory = [];
-          
-          // Save to localStorage
-          localStorage.removeItem('wheelHistory'); // Or set to default values: localStorage.setItem('wheelHistory', JSON.stringify([]));
-          
-          // Update display (this will be handled by showWheelHistory when the modal is reopened)
-          // For immediate visual feedback, we can clear the list here as well
-          const historyList = document.getElementById('wheel-history-list');
-          historyList.innerHTML = '<li>尚無歷史記錄</li>';
-          
-          // Optionally, close the modal after reset
-          closeModal('wheel-history');
         }
         
         // Leaderboard and Nickname Functions
         
-        // Load nicknames from localStorage on startup
-        let diceNickname = localStorage.getItem('diceNickname') || '';
-        let aceNickname = localStorage.getItem('aceNickname') || '';
 
-        function saveDiceNickname() {
-          const input = document.getElementById('dice-nickname-input');
-          if (input && input.value.trim()) {
-            diceNickname = input.value.trim();
-            localStorage.setItem('diceNickname', diceNickname);
           }
         }
         
-        function saveAceNickname() {
-          const input = document.getElementById('ace-nickname-input');
-          if (input && input.value.trim()) {
-            aceNickname = input.value.trim();
-            localStorage.setItem('aceNickname', aceNickname);
           }
         }
         
-        function updateDiceStatsDisplay() {
-          // This function updates the stats display with the current values
-          // It's called after saving nickname or when the modal is opened
-          document.getElementById('dice-rolls').textContent = diceRolls;
           document.getElementById('dice-highest-score').textContent = diceHighestScore;
           document.getElementById('dice-nickname-input').value = diceNickname;
         }
         
-        function updateAceStatsDisplay() {
-          // This function updates the stats display with the current values
-          // It's called after saving nickname or when the modal is opened
-          document.getElementById('ace-wins').textContent = aceWins;
           document.getElementById('ace-losses').textContent = aceLosses;
           document.getElementById('ace-nickname-input').value = aceNickname;
         }
         
         // Helper functions for leaderboards
         
-        function getDiceHighScoreForNickname(nickname) {
-          const entry = diceHighScoreLeaderboard.find(item => item.nickname === nickname);
-          return entry ? entry.score : null;
         }
         
-        function updateDiceHighScoreLeaderboard(nickname, newScore) {
-          // Find existing entry
-          const existingEntryIndex = diceHighScoreLeaderboard.findIndex(item => item.nickname === nickname);
-          
-          if (existingEntryIndex !== -1) {
-            // Update existing entry if new score is higher
-            if (newScore > diceHighScoreLeaderboard[existingEntryIndex].score) {
-              diceHighScoreLeaderboard[existingEntryIndex].score = newScore;
-            }
-          } else {
-            // Add new entry
-            diceHighScoreLeaderboard.push({ nickname: nickname, score: newScore });
-          }
-          
-          // Sort leaderboard by score descending
-          diceHighScoreLeaderboard.sort((a, b) => b.score - a.score);
-          
-          // Keep only top 10
-          if (diceHighScoreLeaderboard.length > 10) {
-            diceHighScoreLeaderboard = diceHighScoreLeaderboard.slice(0, 10);
-          }
-          
-          // Save to localStorage
-          localStorage.setItem('diceHighScoreLeaderboard', JSON.stringify(diceHighScoreLeaderboard));
         }
         
-        function getAceWinRateForNickname(nickname) {
-          const entry = aceWinRateLeaderboard.find(item => item.nickname === nickname);
-          return entry ? entry.rate : null;
         }
         
-        function updateAceWinRateLeaderboard(nickname, wins, totalGames) {
-          if (totalGames === 0) return; // Avoid division by zero
-          
-          const winRate = (wins / totalGames) * 100;
-          
-          // Find existing entry
-          const existingEntryIndex = aceWinRateLeaderboard.findIndex(item => item.nickname === nickname);
-          
-          if (existingEntryIndex !== -1) {
-            // Update existing entry
-            aceWinRateLeaderboard[existingEntryIndex].wins = wins;
-            aceWinRateLeaderboard[existingEntryIndex].totalGames = totalGames;
-            aceWinRateLeaderboard[existingEntryIndex].rate = winRate;
-          } else {
-            // Add new entry
-            aceWinRateLeaderboard.push({ nickname: nickname, wins: wins, totalGames: totalGames, rate: winRate });
-          }
-          
-          // Sort leaderboard by win rate descending
-          aceWinRateLeaderboard.sort((a, b) => b.rate - a.rate);
-          
-          // Keep only top 10
-          if (aceWinRateLeaderboard.length > 10) {
-            aceWinRateLeaderboard = aceWinRateLeaderboard.slice(0, 10);
-          }
-          
-          // Save to localStorage
-          localStorage.setItem('aceWinRateLeaderboard', JSON.stringify(aceWinRateLeaderboard));
         }
         
-        function showLeaderboard() {
-          const leaderboardModalId = 'leaderboard-modal';
-          const diceListId = 'leaderboard-dice-list';
-          const aceListId = 'leaderboard-ace-list';
-          
-          // Get the modal and list elements
-          const modal = document.getElementById(leaderboardModalId);
-          const diceList = document.getElementById(diceListId);
-          const aceList = document.getElementById(aceListId);
-          
-          if (!modal || !diceList || !aceList) {
-            console.error('Leaderboard modal or list elements not found.');
-            return;
-          }
-          
-          // Clear the lists
-          diceList.innerHTML = '';
-          aceList.innerHTML = '';
-          
-          // Populate dice high score leaderboard
-          diceList.innerHTML = '<h3>骰子比大小 - 最高分數</h3>';
-          if (diceHighScoreLeaderboard.length === 0) {
-             diceList.innerHTML += '<p>尚無資料</p>';
-          } else {
-            diceHighScoreLeaderboard.forEach((entry, index) => {
-              const li = document.createElement('li');
-              li.className = 'leaderboard-item';
-              li.innerHTML = `<strong>${index + 1}. ${entry.nickname}</strong>: ${entry.score}`;
-              diceList.appendChild(li);
-            });
-          }
-          
-          // Populate ace win rate leaderboard
-          aceList.innerHTML = '<h3>射龍門 - 勝率</h3>';
-          if (aceWinRateLeaderboard.length === 0) {
-             aceList.innerHTML += '<p>尚無資料</p>';
-          } else {
-            aceWinRateLeaderboard.forEach((entry, index) => {
-              const li = document.createElement('li');
-              li.className = 'leaderboard-item';
-              li.innerHTML = `<strong>${index + 1}. ${entry.nickname}</strong>: ${(entry.rate).toFixed(2)}% (${entry.wins}/${entry.totalGames})`;
-              aceList.appendChild(li);
-            });
-          }
-          
-          // Show the modal using the existing showHelp logic
           showHelp(leaderboardModalId);
         }
         
-        function unlockAchievement(key) {
-          // Load achievement definitions from the external JSON file
-          // Since we cannot directly fetch JSON in this context, we'll define them here or simulate.
-          // For simplicity in this implementation, we'll define them as a constant object here.
-          const achievementsDefinition = {
-            "first_win": {
-              "name": "首戰告捷",
-              "description": "在射龍門遊戲中首次獲勝",
-              "unlocked": false
-            },
-            "lucky_number": {
-              "name": "幸運18",
-              "description": "在骰子比大小中一次獲得18點",
-              "unlocked": false
-            },
-            "wheel_spin_master": {
-              "name": "轉盤大師",
-              "description": "在幸運轉盤中獲勝5次",
-              "unlocked": false
-            }
-          };
-          
-          if (!unlockedAchievements[key] && achievementsDefinition[key]) {
-            unlockedAchievements[key] = true;
-            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
-            // Potentially show a notification to the user
-            alert(`恭喜解鎖成就: ${achievementsDefinition[key].name} - ${achievementsDefinition[key].description}`);
           }
         }
         
-        function showAchievements() {
-          // This function will toggle the achievements modal
-          // We need to create the modal content dynamically based on unlockedAchievements
-          // Or simply reuse the showHelp/closeModal logic with a new modal ID
           // First, ensure the modal exists in HTML
           // Then populate its content based on unlockedAchievements
           // For this, I'll assume an achievements modal exists and update its content
@@ -1480,21 +1190,6 @@
         </div>
     </div>
 
-    <!-- Dice Game Stats Modal -->
-    <div id="dice-stats" class="modal hidden">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('dice-stats')">&times;</span>
-            <h2>骰子比大小 統計</h2>
-            <p>您的暱稱: <input type="text" id="dice-nickname-input" placeholder="輸入您的暱稱" maxlength="20"></p>
-            <p>總共搖骰次數: <span id="dice-rolls">0</span></p>
-            <p>最高分數: <span id="dice-highest-score">0</span></p>
-            <button onclick="saveDiceNickname(); updateDiceStatsDisplay();" class="golden-button px-8 py-3 mt-2">
-                <i class="fas fa-save mr-2"></i>儲存暱稱
-            </button>
-            <button onclick="resetDiceStats()" class="golden-button px-8 py-3 mt-4">
-                <i class="fas fa-redo mr-2"></i>重置統計
-            </button>
-        </div>
     </div>
 
     <!-- Ace in the Hole Help Modal -->
@@ -1509,21 +1204,6 @@
         </div>
     </div>
 
-    <!-- Ace in the Hole Stats Modal -->
-    <div id="ace-stats" class="modal hidden">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ace-stats')">&times;</span>
-            <h2>射龍門 統計</h2>
-            <p>您的暱稱: <input type="text" id="ace-nickname-input" placeholder="輸入您的暱稱" maxlength="20"></p>
-            <p>獲勝次數: <span id="ace-wins">0</span></p>
-            <p>失敗次數: <span id="ace-losses">0</span></p>
-            <button onclick="saveAceNickname(); updateAceStatsDisplay();" class="golden-button px-8 py-3 mt-2">
-                <i class="fas fa-save mr-2"></i>儲存暱稱
-            </button>
-            <button onclick="resetAceStats()" class="golden-button px-8 py-3 mt-4">
-                <i class="fas fa-redo mr-2"></i>重置統計
-            </button>
-        </div>
     </div>
 
     <!-- Lucky Wheel Help Modal -->
@@ -1538,40 +1218,9 @@
         </div>
     </div>
 
-    <!-- Lucky Wheel History Modal -->
-    <div id="wheel-history" class="modal hidden">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('wheel-history')">&times;</span>
-            <h2>幸運轉盤 歷史</h2>
-            <ul id="wheel-history-list">
-                <!-- History items will be inserted here by JavaScript -->
-            </ul>
-            <button onclick="resetWheelHistory()" class="golden-button px-8 py-3 mt-4">
-                <i class="fas fa-redo mr-2"></i>重置歷史
-            </button>
-        </div>
     </div>
-    <!-- Achievements Modal -->
-    <div id="achievements-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('achievements-modal')">&times;</span>
-            <h2>成就</h2>
-            <ul id="achievements-list">
-                <!-- Achievement items will be inserted here by JavaScript -->
-            </ul>
-        </div>
     </div>
     
-    <!-- Leaderboard Modal -->
-    <div id="leaderboard-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('leaderboard-modal')">&times;</span>
-            <h2>排行榜</h2>
-            <div class="leaderboard-section">
-                <ul id="leaderboard-dice-list">
-                    <!-- Dice leaderboard items will be inserted here by JavaScript -->
-                </ul>
-            </div>
             <div class="leaderboard-section">
                 <ul id="leaderboard-ace-list">
                     <!-- Ace leaderboard items will be inserted here by JavaScript -->
